@@ -9,6 +9,9 @@ import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
 import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
 
+import java.util.HashMap;
+import java.util.Map;
+
 class MessagingUtils implements MqttCallback
 {
     private static final String MQTT_CLIENT_ID = "SomethingClient";
@@ -34,6 +37,8 @@ class MessagingUtils implements MqttCallback
     }
 
     private MqttClient mMqttClient = null;
+    private ConnectionLostHandler mConnectionLostHandler = null;
+    private Map<String,NewGameMessageHandler> topicHandlerMap = new HashMap<String, NewGameMessageHandler>();
 
     private MessagingUtils() throws MqttException
     {
@@ -41,13 +46,15 @@ class MessagingUtils implements MqttCallback
         mMqttClient = new MqttClient(MQTT_BROKER_URL,MQTT_CLIENT_ID,persistence);
     }
 
-    public void sendMesage(String topicString,String messageString)
+    public void sendMessage(String topicString, String messageString)
     {
         if(!mMqttClient.isConnected())
         {
+            Log.i("SomethingLiberty","Not connected, connecting to broker");
             try
             {
                 mMqttClient.connect();
+                mMqttClient.setCallback(this);
             }
             catch(MqttException e)
             {
@@ -56,33 +63,84 @@ class MessagingUtils implements MqttCallback
                 e.printStackTrace();
                 return;
             }
-            MqttMessage message = new MqttMessage();
-            message.setPayload(messageString.getBytes());
+            Log.i("SomethingLiberty","Connected to broker");
+        }
+
+        MqttMessage message = new MqttMessage();
+        message.setPayload(messageString.getBytes());
+        try
+        {
+            mMqttClient.publish(topicString,message);
+        }
+        catch(MqttException e)
+        {
+            Log.e("SomethingLiberty","Failed to send message string : " + messageString + " to topic " + topicString);
+            e.printStackTrace();
+            return;
+        }
+        Log.i("SomethingLiberty","Sent message : " + messageString + " to topic : " + topicString);
+
+    }
+
+    public void subscribeToTopic(String topic,NewGameMessageHandler callback)
+    {
+        if(!mMqttClient.isConnected())
+        {
             try
             {
-                mMqttClient.publish(topicString,message);
+                mMqttClient.connect();
+                mMqttClient.setCallback(this);
             }
             catch(MqttException e)
             {
-                Log.e("SomethingLiberty","Failed to send message string : " + messageString + " to topic " + topicString);
+                Log.e("SomethingLiberty","Failed to connect to broker whilst subscribing to topic : " + topic);
                 e.printStackTrace();
                 return;
             }
-            Log.i("SomethingLiberty","Sent message : " + messageString + " to topic : " + topicString);
+            Log.i("SomethingLiberty","Connected to broker");
         }
+
+        try
+        {
+            mMqttClient.subscribe(topic);
+        }
+        catch(MqttException e)
+        {
+            Log.e("SomethingLiberty","Failed to subscribe to topic : " + topic);
+            e.printStackTrace();
+            return;
+        }
+        Log.i("SomethingLiberty","Subscribed to topic : " + topic);
+
+        topicHandlerMap.put(topic, callback);
     }
 
     @Override
     public void connectionLost(Throwable throwable)
     {
+        if(mConnectionLostHandler != null)
+        {
+            mConnectionLostHandler.onConnectionLost(throwable);
+        }
         Log.i("SomethingLiberty","Lost connection to broker : " + throwable.getMessage());
     }
 
     @Override
     public void messageArrived(String topic, MqttMessage mqttMessage)
     {
-        Log.i("SomethingLiberty","Recieved message : " + mqttMessage.getPayload() + " on topic " + topic);
-    }
+        Log.i("SomethingLiberty","Recieved message : " + new String(mqttMessage.getPayload()) + " on topic " + topic);
+
+        NewGameMessageHandler handlerToEnvoke = topicHandlerMap.get(topic);
+        if(handlerToEnvoke != null)
+        {
+            Log.i("SomethingLiberty","Handling message");
+            handlerToEnvoke.onNewGameMessage(topic, mqttMessage);
+        }
+        else
+        {
+            Log.i("SomethingLiberty","Not handling message");
+        }
+     }
 
     @Override
     public void deliveryComplete(IMqttDeliveryToken iMqttDeliveryToken)
@@ -96,6 +154,11 @@ class MessagingUtils implements MqttCallback
             Log.e("SomethingLiberty","Failed to read IMqttDeliveryToken");
             e.printStackTrace();
         }
+    }
+
+    public void setConnectionLostHandler(ConnectionLostHandler handler)
+    {
+        mConnectionLostHandler = handler;
     }
 
     @Override

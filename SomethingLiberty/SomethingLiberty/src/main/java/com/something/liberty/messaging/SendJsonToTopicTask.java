@@ -26,7 +26,7 @@ public class SendJsonToTopicTask extends AsyncTask<JSONObject,Void,Void> {
         String jsonString = jsonMessage.toString();
         Log.d("SomethingLiberty","jsonString = " + jsonString);
         MessagingUtils messagingUtils = MessagingUtils.getMessagingUtils();
-        messagingUtils.sendMesage(mTopic,jsonString);
+        messagingUtils.sendMessage(mTopic, jsonString);
         return null;
     }
 }
