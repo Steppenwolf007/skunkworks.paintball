@@ -128,7 +128,7 @@ class MessagingUtils implements MqttCallback
     @Override
     public void messageArrived(String topic, MqttMessage mqttMessage)
     {
-        Log.i("SomethingLiberty","Recieved message : " + new String(mqttMessage.getPayload()) + " on topic " + topic);
+        Log.i("SomethingLiberty","Received message : " + new String(mqttMessage.getPayload()) + " on topic " + topic);
 
         NewGameMessageHandler handlerToEnvoke = topicHandlerMap.get(topic);
         if(handlerToEnvoke != null)
