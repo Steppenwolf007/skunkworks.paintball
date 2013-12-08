@@ -19,7 +19,7 @@ class MessagingUtils implements MqttCallback
 
     private static MessagingUtils mMessagingUtils = null;
 
-    public static MessagingUtils getMessagingUtils()
+    public static synchronized MessagingUtils getMessagingUtils()
     {
         if(mMessagingUtils == null)
         {
