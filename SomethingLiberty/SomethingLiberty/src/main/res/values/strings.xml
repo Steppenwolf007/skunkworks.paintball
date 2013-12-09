@@ -4,5 +4,6 @@
     <string name="app_name">SomethingLiberty</string>
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
+    <string name="notification_ticker">News Flash</string>
 
 </resources>
