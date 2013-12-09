@@ -46,24 +46,29 @@ class MessagingUtils implements MqttCallback
         mMqttClient = new MqttClient(MQTT_BROKER_URL,MQTT_CLIENT_ID,persistence);
     }
 
+    public synchronized void connectToBroker() throws MqttException
+    {
+        if(!mMqttClient.isConnected())
+        {
+            mMqttClient.connect();
+            mMqttClient.setCallback(this);
+            Log.i("SomethingLiberty","Connected to broker : " + BrokerDetails.MQTT_BROKER_URL);
+        }
+    }
+
     public void sendMessage(String topicString, String messageString)
     {
         if(!mMqttClient.isConnected())
         {
-            Log.i("SomethingLiberty","Not connected, connecting to broker");
             try
             {
-                mMqttClient.connect();
-                mMqttClient.setCallback(this);
+                connectToBroker();
             }
             catch(MqttException e)
             {
-                Log.e("SomethingLiberty","Failed to connect to broker whilst sending message : "
-                        + messageString + " to topic : " + topicString);
-                e.printStackTrace();
+                Log.e("SomethingLiberty","Failed to connect to broker whilst publishing : " + messageString + "  to topic : " + topicString);
                 return;
             }
-            Log.i("SomethingLiberty","Connected to broker");
         }
 
         MqttMessage message = new MqttMessage();
@@ -88,16 +93,13 @@ class MessagingUtils implements MqttCallback
         {
             try
             {
-                mMqttClient.connect();
-                mMqttClient.setCallback(this);
+                connectToBroker();
             }
             catch(MqttException e)
             {
                 Log.e("SomethingLiberty","Failed to connect to broker whilst subscribing to topic : " + topic);
-                e.printStackTrace();
                 return;
             }
-            Log.i("SomethingLiberty","Connected to broker");
         }
 
         try
