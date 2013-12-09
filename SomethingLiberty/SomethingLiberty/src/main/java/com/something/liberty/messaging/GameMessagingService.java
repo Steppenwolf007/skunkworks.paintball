@@ -8,6 +8,7 @@ import android.os.PowerManager;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.something.liberty.UserUtils;
 import com.something.liberty.alerts.NotificationUtils;
 
 import org.eclipse.paho.client.mqttv3.MqttMessage;
@@ -16,9 +17,13 @@ import org.json.JSONObject;
 
 public class GameMessagingService extends Service implements NewGameMessageHandler, ConnectionLostHandler
 {
-    private Handler uiThreadHandler = null;
     private static final String MQTT_TOPIC_KILLED = "something/killed/";
     private static final String MQTT_TOPIC_ATTACK_RESPONSE = "something/attackResponse/";
+    private static final String MQTT_TOPIC_LOCATION_UPDATE = "something/locationUpdate";
+
+    public static final String ACTION_UPDATE_LOCATION = "UPDATE_LOCATION";
+
+    private Handler uiThreadHandler = null;
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
@@ -46,6 +51,15 @@ public class GameMessagingService extends Service implements NewGameMessageHandl
 
     @Override
     public IBinder onBind(Intent intent) {
+        if(ACTION_UPDATE_LOCATION.equals(intent.getAction()))
+        {
+            double latitude = intent.getDoubleExtra("latitude",0);
+            double longitude = intent.getDoubleExtra("longitude",0);
+            if(latitude != 0 && longitude != 0)
+            {
+                sendLocationUpdate(latitude,longitude);
+            }
+        }
         return null;
     }
 
@@ -126,4 +140,26 @@ public class GameMessagingService extends Service implements NewGameMessageHandl
         NotificationUtils notificationUtils = new NotificationUtils(this);
         notificationUtils.displayGenericNotification(responseResult,messageToDisplay);
     }
+
+    private void sendLocationUpdate(double latitude, double longitude)
+    {
+        JSONObject locationUpdate = null;
+        try
+        {
+            locationUpdate = new JSONObject();
+            locationUpdate.put("latitude",latitude);
+            locationUpdate.put("longitude",longitude);
+            locationUpdate.put("username", UserUtils.getUsername(this));
+        }
+        catch(JSONException e)
+        {
+            Log.e("SomethingLiberty","GameMessagingServer : failed to create location update message");
+            e.printStackTrace();
+            return;
+        }
+        MessagingUtils messagingUtils = MessagingUtils.getMessagingUtils();
+        messagingUtils.sendMessage(MQTT_TOPIC_LOCATION_UPDATE,locationUpdate.toString());
+    }
+
+
 }
