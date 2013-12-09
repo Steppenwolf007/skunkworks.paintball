@@ -8,11 +8,17 @@ import android.os.PowerManager;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.something.liberty.alerts.NotificationUtils;
+
 import org.eclipse.paho.client.mqttv3.MqttMessage;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 public class GameMessagingService extends Service implements NewGameMessageHandler, ConnectionLostHandler
 {
     private Handler uiThreadHandler = null;
+    private static final String MQTT_TOPIC_KILLED = "something/killed/";
+    private static final String MQTT_TOPIC_ATTACK_RESPONSE = "something/attackResponse/";
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
@@ -29,8 +35,8 @@ public class GameMessagingService extends Service implements NewGameMessageHandl
             public void run() {
 
                 MessagingUtils messagingUtils = MessagingUtils.getMessagingUtils();
-                messagingUtils.subscribeToTopic("something/killed/alex_pringle",thisMessageHandler);
-                messagingUtils.subscribeToTopic("something/attResponse/alex_pringle",thisMessageHandler);
+                messagingUtils.subscribeToTopic(MQTT_TOPIC_KILLED + "alex_pringle",thisMessageHandler);
+                messagingUtils.subscribeToTopic(MQTT_TOPIC_ATTACK_RESPONSE + "alex_pringle",thisMessageHandler);
                 messagingUtils.setConnectionLostHandler(thisConnectionLostHandler);
             }
         }).run();
@@ -52,6 +58,15 @@ public class GameMessagingService extends Service implements NewGameMessageHandl
                 String messageString = new String(message.getPayload());
                 Log.i("SomethingLiberty", "GameMessagingService : received : " + messageString);
                 Toast.makeText(thisService,messageString,Toast.LENGTH_SHORT).show();
+
+                if(topic.contains(MQTT_TOPIC_KILLED))
+                {
+                    handleKilledMessage(message);
+                }
+                else if(topic.contains(MQTT_TOPIC_ATTACK_RESPONSE))
+                {
+                    handleAttackResponseMessage(message);
+                }
             }
         });
     }
@@ -66,5 +81,49 @@ public class GameMessagingService extends Service implements NewGameMessageHandl
                 Toast.makeText(thisService,"Lost Mqtt connection",Toast.LENGTH_SHORT).show();
             }
         });
+    }
+
+    private void handleKilledMessage(MqttMessage killedMessage)
+    {
+        String payloadString = new String(killedMessage.getPayload());
+        String messageToDisplay = null;
+        try
+        {
+            JSONObject payloadObject = null;
+            payloadObject = new JSONObject(payloadString);
+            messageToDisplay = payloadObject.getString("message");
+        }
+        catch(JSONException e)
+        {
+            e.printStackTrace();
+            Log.e("SomethingLiberty","Failed to parse killed message");
+            return;
+        }
+
+        NotificationUtils notificationUtils = new NotificationUtils(this);
+        notificationUtils.displayGenericNotification("Killed",messageToDisplay);
+    }
+
+    private void handleAttackResponseMessage(MqttMessage attackResponseMessage)
+    {
+        String payloadString = new String(attackResponseMessage.getPayload());
+        String responseResult = null;
+        String messageToDisplay = null;
+        try
+        {
+            JSONObject payloadObject = null;
+            payloadObject = new JSONObject(payloadString);
+            responseResult = payloadObject.getString("result");
+            messageToDisplay = payloadObject.getString("attackerMessage");
+        }
+        catch(JSONException e)
+        {
+            e.printStackTrace();
+            Log.e("SomethingLiberty","Failed to parse attack response message");
+            return;
+        }
+
+        NotificationUtils notificationUtils = new NotificationUtils(this);
+        notificationUtils.displayGenericNotification(responseResult,messageToDisplay);
     }
 }
