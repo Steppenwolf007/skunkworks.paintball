@@ -20,13 +20,16 @@ public class GameMessagingService extends Service implements NewGameMessageHandl
     private static final String MQTT_TOPIC_KILLED = "something/killed/";
     private static final String MQTT_TOPIC_ATTACK_RESPONSE = "something/attackResponse/";
     private static final String MQTT_TOPIC_LOCATION_UPDATE = "something/locationUpdate";
+    private static final String MQTT_TOPIC_ATTACK = "something/attack";
 
     public static final String ACTION_UPDATE_LOCATION = "UPDATE_LOCATION";
+    public static final String ACTION_ATTACK = "ATTACK";
 
     private Handler uiThreadHandler = null;
 
     @Override
-    public int onStartCommand(Intent intent, int flags, int startId) {
+    public int onStartCommand(Intent intent, int flags, int startId)
+    {
         Toast.makeText(getApplicationContext(),"Service started",Toast.LENGTH_SHORT).show();
         uiThreadHandler = new Handler();
 
@@ -50,7 +53,8 @@ public class GameMessagingService extends Service implements NewGameMessageHandl
     }
 
     @Override
-    public IBinder onBind(Intent intent) {
+    public IBinder onBind(Intent intent)
+    {
         if(ACTION_UPDATE_LOCATION.equals(intent.getAction()))
         {
             double latitude = intent.getDoubleExtra("latitude",0);
@@ -60,11 +64,25 @@ public class GameMessagingService extends Service implements NewGameMessageHandl
                 sendLocationUpdate(latitude,longitude);
             }
         }
+        else if(ACTION_ATTACK.equals(intent.getAction()))
+        {
+            double latitude = intent.getDoubleExtra("latitude",0);
+            double longitude = intent.getDoubleExtra("longitude",0);
+            if(latitude != 0 && longitude != 0)
+            {
+                sendAttack(latitude, longitude);
+            }
+            else
+            {
+                Log.e("SomethingLiberty","GameMessagingService : received invalid attack request");
+            }
+        }
         return null;
     }
 
     @Override
-    public void onNewGameMessage(final String topic, final MqttMessage message) {
+    public void onNewGameMessage(final String topic, final MqttMessage message)
+    {
         final Service thisService = this;
         uiThreadHandler.post(new Runnable() {
             @Override
@@ -86,7 +104,8 @@ public class GameMessagingService extends Service implements NewGameMessageHandl
     }
 
     @Override
-    public void onConnectionLost(final Throwable cause) {
+    public void onConnectionLost(final Throwable cause)
+    {
         final Service thisService = this;
         uiThreadHandler.post(new Runnable() {
             @Override
@@ -161,5 +180,24 @@ public class GameMessagingService extends Service implements NewGameMessageHandl
         messagingUtils.sendMessage(MQTT_TOPIC_LOCATION_UPDATE,locationUpdate.toString());
     }
 
+    private void sendAttack(double latitude, double longitude)
+    {
+        JSONObject locationUpdate = null;
+        try
+        {
+            locationUpdate = new JSONObject();
+            locationUpdate.put("latitude",latitude);
+            locationUpdate.put("longitude",longitude);
+            locationUpdate.put("username", UserUtils.getUsername(this));
+        }
+        catch(JSONException e)
+        {
+            Log.e("SomethingLiberty","GameMessagingServer : failed to create attack message");
+            e.printStackTrace();
+            return;
+        }
+        MessagingUtils messagingUtils = MessagingUtils.getMessagingUtils();
+        messagingUtils.sendMessage(MQTT_TOPIC_ATTACK,locationUpdate.toString());
+    }
 
 }
