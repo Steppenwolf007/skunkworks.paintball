@@ -17,7 +17,7 @@ public class NotificationUtils
     {
         mContext = context;
     }
-    
+
     public void displayGenericNotification(String titleString,String contentString)
     {
         NotificationManager notificationManager = (NotificationManager) mContext.getSystemService(Service.NOTIFICATION_SERVICE);
