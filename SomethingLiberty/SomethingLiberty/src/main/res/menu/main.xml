@@ -6,7 +6,7 @@
     <item android:id="@+id/action_attack"
         android:title="@string/action_attack"
         android:icon="@drawable/ic_launcher"
-        android:showAsAction="always"/>
+        app:showAsAction="always"/>
 
     <item android:id="@+id/action_settings"
         android:title="@string/action_settings"
