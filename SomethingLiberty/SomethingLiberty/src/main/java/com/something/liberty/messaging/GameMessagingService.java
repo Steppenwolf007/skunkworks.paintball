@@ -26,6 +26,16 @@ public class GameMessagingService extends Service implements NewGameMessageHandl
     public static final String ACTION_ATTACK = "ATTACK";
 
     private Handler uiThreadHandler = null;
+    private PowerManager.WakeLock wakeLock = null;
+
+    @Override
+    public void onCreate() {
+        super.onCreate();
+
+        PowerManager powerManager = (PowerManager) getSystemService(Service.POWER_SERVICE);
+        wakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK,"SomethingLibertyWakeLock");
+        wakeLock.acquire();
+    }
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId)
@@ -35,9 +45,7 @@ public class GameMessagingService extends Service implements NewGameMessageHandl
 
         final ConnectionLostHandler thisConnectionLostHandler = this;
         final NewGameMessageHandler thisMessageHandler = this;
-        PowerManager powerManager = (PowerManager) getSystemService(Service.POWER_SERVICE);
-        PowerManager.WakeLock wakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK,"SomethingLibertyWakeLock");
-        wakeLock.acquire();
+
         new Thread(new Runnable(){
             @Override
             public void run() {
@@ -200,4 +208,9 @@ public class GameMessagingService extends Service implements NewGameMessageHandl
         messagingUtils.sendMessage(MQTT_TOPIC_ATTACK,locationUpdate.toString());
     }
 
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        wakeLock.release();
+    }
 }
