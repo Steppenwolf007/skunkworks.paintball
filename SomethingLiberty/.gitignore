@@ -7,3 +7,5 @@
 *.iml
 *proguard*
 *BrokerDetails.java
+SomethingLiberty/assets/OpenLayers
+SomethingLiberty/libs
