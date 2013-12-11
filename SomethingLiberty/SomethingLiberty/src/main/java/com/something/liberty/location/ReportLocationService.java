@@ -14,6 +14,7 @@ import android.util.Log;
 
 import com.something.liberty.UserUtils;
 import com.something.liberty.messaging.GameMessagingService;
+import com.something.liberty.messaging.SendMessage;
 
 public class ReportLocationService extends Service {
 
@@ -41,7 +42,7 @@ public class ReportLocationService extends Service {
             @Override
             public void onLocationChanged(Location location) {
                 Log.i("SomethingLiberty","Received location update from device");
-                sendLocationUpdate(location);
+                SendMessage.sendLocationUpdate(getApplicationContext(),location.getLongitude(),location.getLatitude());
             }
 
             @Override
@@ -59,28 +60,6 @@ public class ReportLocationService extends Service {
 
             }
         },null);
-    }
-
-    private void sendLocationUpdate(Location location)
-    {
-        Intent updateLocationIntent = new Intent(this,GameMessagingService.class);
-        updateLocationIntent.setAction(GameMessagingService.ACTION_UPDATE_LOCATION);
-
-        updateLocationIntent.putExtra("username", UserUtils.getUsername(this));
-        updateLocationIntent.putExtra("latitude", location.getLatitude());
-        updateLocationIntent.putExtra("longitude", location.getLongitude());
-
-        this.bindService(updateLocationIntent, new ServiceConnection() {
-            @Override
-            public void onServiceConnected(ComponentName name, IBinder service) {
-
-            }
-
-            @Override
-            public void onServiceDisconnected(ComponentName name) {
-
-            }
-        }, Context.BIND_AUTO_CREATE);
     }
 
 }
