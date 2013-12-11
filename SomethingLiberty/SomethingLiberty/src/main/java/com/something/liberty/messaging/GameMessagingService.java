@@ -1,5 +1,6 @@
 package com.something.liberty.messaging;
 
+import android.app.AlertDialog;
 import android.app.Service;
 import android.content.Intent;
 import android.os.Handler;
@@ -141,8 +142,10 @@ public class GameMessagingService extends Service implements NewGameMessageHandl
             return;
         }
 
-        NotificationUtils notificationUtils = new NotificationUtils(this);
-        notificationUtils.displayGenericNotification("Killed",messageToDisplay);
+        Intent broadcastMessageIntent = new Intent();
+        broadcastMessageIntent.setAction(GameMessageReciever.ACTION_HANDLE_KILLED_MESSAGE);
+        broadcastMessageIntent.putExtra("message",messageToDisplay);
+        sendOrderedBroadcast(broadcastMessageIntent, null);
     }
 
     private void handleAttackResponseMessage(MqttMessage attackResponseMessage)
@@ -164,8 +167,11 @@ public class GameMessagingService extends Service implements NewGameMessageHandl
             return;
         }
 
-        NotificationUtils notificationUtils = new NotificationUtils(this);
-        notificationUtils.displayGenericNotification(responseResult,messageToDisplay);
+        Intent broadcastMessageIntent = new Intent();
+        broadcastMessageIntent.setAction(GameMessageReciever.ACTION_HANDLE_ATTACK_RESPONSE_MESSAGE);
+        broadcastMessageIntent.putExtra("result",responseResult);
+        broadcastMessageIntent.putExtra("message",messageToDisplay);
+        sendOrderedBroadcast(broadcastMessageIntent,null);
     }
 
     private void sendLocationUpdate(double latitude, double longitude)
@@ -206,7 +212,7 @@ public class GameMessagingService extends Service implements NewGameMessageHandl
         }
         MessagingUtils messagingUtils = MessagingUtils.getMessagingUtils();
         messagingUtils.sendMessage(MQTT_TOPIC_ATTACK,locationUpdate.toString());
-    }
+    } 
 
     @Override
     public void onDestroy() {

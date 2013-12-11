@@ -32,7 +32,7 @@ public class NotificationUtils
 
         builder.setVibrate(new long[]{100,100,100,100});
 
-        notificationManager.notify(1,builder.build());
+        notificationManager.notify(contentString.hashCode(),builder.build());
     }
 
 }
