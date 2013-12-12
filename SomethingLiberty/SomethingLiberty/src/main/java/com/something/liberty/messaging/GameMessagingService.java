@@ -19,9 +19,9 @@ import org.json.JSONObject;
 public class GameMessagingService extends Service implements NewGameMessageHandler, ConnectionLostHandler
 {
     private static final String MQTT_TOPIC_KILLED = "something/killed/";
-    private static final String MQTT_TOPIC_ATTACK_RESPONSE = "something/attackResponse/";
-    private static final String MQTT_TOPIC_LOCATION_UPDATE = "something/locationUpdate";
-    private static final String MQTT_TOPIC_ATTACK = "something/attack";
+    private static final String MQTT_TOPIC_ATTACK_RESPONSE = "something/attResponse/";
+    public static final String MQTT_TOPIC_LOCATION_UPDATE = "something/locationUpdate";
+    public static final String MQTT_TOPIC_ATTACK = "something/attack";
 
     public static final String ACTION_UPDATE_LOCATION = "UPDATE_LOCATION";
     public static final String ACTION_ATTACK = "ATTACK";
@@ -157,7 +157,7 @@ public class GameMessagingService extends Service implements NewGameMessageHandl
         {
             JSONObject payloadObject = null;
             payloadObject = new JSONObject(payloadString);
-            responseResult = payloadObject.getString("result");
+            responseResult = payloadObject.getString("responseType");
             messageToDisplay = payloadObject.getString("attackerMessage");
         }
         catch(JSONException e)
@@ -169,8 +169,8 @@ public class GameMessagingService extends Service implements NewGameMessageHandl
 
         Intent broadcastMessageIntent = new Intent();
         broadcastMessageIntent.setAction(GameMessageReciever.ACTION_HANDLE_ATTACK_RESPONSE_MESSAGE);
-        broadcastMessageIntent.putExtra("result",responseResult);
-        broadcastMessageIntent.putExtra("message",messageToDisplay);
+        broadcastMessageIntent.putExtra("responseType", responseResult);
+        broadcastMessageIntent.putExtra("attackerMessage",messageToDisplay);
         sendOrderedBroadcast(broadcastMessageIntent,null);
     }
 

@@ -94,8 +94,8 @@ public class MainActivity extends ActionBarActivity {
                 }
                 else if(GameMessageReciever.ACTION_HANDLE_ATTACK_RESPONSE_MESSAGE.equals(intent.getAction()))
                 {
-                    String title = intent.getStringExtra("result");
-                    String message = intent.getStringExtra("message");
+                    String title = intent.getStringExtra("responseType");
+                    String message = intent.getStringExtra("attackerMessage");
                     showMessageDialog(title,message);
                 }
                 abortBroadcast();

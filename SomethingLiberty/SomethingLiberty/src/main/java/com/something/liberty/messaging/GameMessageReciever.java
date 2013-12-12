@@ -18,11 +18,11 @@ public class GameMessageReciever extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
         NotificationUtils notificationUtils = new NotificationUtils(context);
-        Log.i("SomethingLiberty","in reciever");
+        Log.i("SomethingLiberty","in receiver");
         if(ACTION_HANDLE_ATTACK_RESPONSE_MESSAGE.equals(intent.getAction()))
         {
-            String responseType = intent.getStringExtra("type");
-            String message = intent.getStringExtra("message");
+            String responseType = intent.getStringExtra("responseType");
+            String message = intent.getStringExtra("attackerMessage");
             notificationUtils.displayGenericNotification(responseType,message);
         }
         else if(ACTION_HANDLE_KILLED_MESSAGE.equals(intent.getAction()))
