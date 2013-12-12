@@ -46,14 +46,15 @@ public class GameMessagingService extends Service implements NewGameMessageHandl
 
         final ConnectionLostHandler thisConnectionLostHandler = this;
         final NewGameMessageHandler thisMessageHandler = this;
+        final String username = UserUtils.getUsername(this);
 
         new Thread(new Runnable(){
             @Override
             public void run() {
 
                 MessagingUtils messagingUtils = MessagingUtils.getMessagingUtils();
-                messagingUtils.subscribeToTopic(MQTT_TOPIC_KILLED + "alex_pringle",thisMessageHandler);
-                messagingUtils.subscribeToTopic(MQTT_TOPIC_ATTACK_RESPONSE + "alex_pringle",thisMessageHandler);
+                messagingUtils.subscribeToTopic(MQTT_TOPIC_KILLED + username,thisMessageHandler);
+                messagingUtils.subscribeToTopic(MQTT_TOPIC_ATTACK_RESPONSE + username,thisMessageHandler);
                 messagingUtils.setConnectionLostHandler(thisConnectionLostHandler);
             }
         }).run();

@@ -14,4 +14,10 @@ public class UserUtils
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
         return sharedPreferences.getString(PREFS_USERNAME,DEFAULT_USERNAME);
     }
+
+    public static void setUsername(Context context,String username)
+    {
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
+        sharedPreferences.edit().putString(PREFS_USERNAME,username).commit();
+    }
 }
