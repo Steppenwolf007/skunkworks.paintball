@@ -1,6 +1,5 @@
 package com.something.liberty.messaging;
 
-import android.app.AlertDialog;
 import android.app.Service;
 import android.content.Intent;
 import android.os.Handler;
@@ -10,7 +9,6 @@ import android.util.Log;
 import android.widget.Toast;
 
 import com.something.liberty.UserUtils;
-import com.something.liberty.alerts.NotificationUtils;
 
 import org.eclipse.paho.client.mqttv3.MqttMessage;
 import org.json.JSONException;
@@ -32,7 +30,6 @@ public class GameMessagingService extends Service implements NewGameMessageHandl
     @Override
     public void onCreate() {
         super.onCreate();
-
         PowerManager powerManager = (PowerManager) getSystemService(Service.POWER_SERVICE);
         wakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK,"SomethingLibertyWakeLock");
         wakeLock.acquire();
@@ -47,7 +44,6 @@ public class GameMessagingService extends Service implements NewGameMessageHandl
         final ConnectionLostHandler thisConnectionLostHandler = this;
         final NewGameMessageHandler thisMessageHandler = this;
         final String username = UserUtils.getUsername(this);
-
         new Thread(new Runnable(){
             @Override
             public void run() {
@@ -58,6 +54,7 @@ public class GameMessagingService extends Service implements NewGameMessageHandl
                 messagingUtils.setConnectionLostHandler(thisConnectionLostHandler);
             }
         }).run();
+
 
         return START_STICKY;
     }
@@ -72,19 +69,6 @@ public class GameMessagingService extends Service implements NewGameMessageHandl
             if(latitude != 0 && longitude != 0)
             {
                 sendLocationUpdate(latitude,longitude);
-            }
-        }
-        else if(ACTION_ATTACK.equals(intent.getAction()))
-        {
-            double latitude = intent.getDoubleExtra("latitude",0);
-            double longitude = intent.getDoubleExtra("longitude",0);
-            if(latitude != 0 && longitude != 0)
-            {
-                sendAttack(latitude, longitude);
-            }
-            else
-            {
-                Log.e("SomethingLiberty","GameMessagingService : received invalid attack request");
             }
         }
         return null;
@@ -195,25 +179,7 @@ public class GameMessagingService extends Service implements NewGameMessageHandl
         messagingUtils.sendMessage(MQTT_TOPIC_LOCATION_UPDATE,locationUpdate.toString());
     }
 
-    private void sendAttack(double latitude, double longitude)
-    {
-        JSONObject locationUpdate = null;
-        try
-        {
-            locationUpdate = new JSONObject();
-            locationUpdate.put("latitude",latitude);
-            locationUpdate.put("longitude",longitude);
-            locationUpdate.put("username", UserUtils.getUsername(this));
-        }
-        catch(JSONException e)
-        {
-            Log.e("SomethingLiberty","GameMessagingServer : failed to create attack message");
-            e.printStackTrace();
-            return;
-        }
-        MessagingUtils messagingUtils = MessagingUtils.getMessagingUtils();
-        messagingUtils.sendMessage(MQTT_TOPIC_ATTACK,locationUpdate.toString());
-    } 
+
 
     @Override
     public void onDestroy() {
