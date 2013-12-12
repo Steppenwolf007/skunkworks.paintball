@@ -10,6 +10,7 @@ import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.os.PowerManager;
 import android.util.Log;
 
 import com.something.liberty.UserUtils;
@@ -42,7 +43,11 @@ public class ReportLocationService extends Service {
             @Override
             public void onLocationChanged(Location location) {
                 Log.i("SomethingLiberty","Received location update from device");
+                PowerManager powerManager = (PowerManager) getSystemService(Service.POWER_SERVICE);
+                PowerManager.WakeLock wakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK,"SomethingLibertyLocations");
+                wakeLock.acquire();
                 SendMessage.sendLocationUpdate(getApplicationContext(),location.getLongitude(),location.getLatitude());
+                wakeLock.release();
             }
 
             @Override
