@@ -52,4 +52,19 @@ public class SendMessage
             }
         },Context.BIND_AUTO_CREATE);
     }
+
+    public static void sendNewsRequest(Context context)
+    {
+        JSONObject request = new JSONObject();
+        try
+        {
+            request.put("username",UserUtils.getUsername(context));
+        }
+        catch(JSONException e)
+        {
+            Log.e("SomethingLiberty","Failed to request news");
+            e.printStackTrace();
+        }
+        new SendJsonToTopicTask(GameMessagingService.MQTT_TOPIC_REQUEST_NEWS).execute(request);
+    }
 }

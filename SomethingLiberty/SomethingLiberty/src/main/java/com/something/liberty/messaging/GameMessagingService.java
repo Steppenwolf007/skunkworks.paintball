@@ -8,6 +8,7 @@ import android.os.PowerManager;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.something.liberty.MainActivity;
 import com.something.liberty.UserUtils;
 
 import org.eclipse.paho.client.mqttv3.MqttMessage;
@@ -18,6 +19,9 @@ public class GameMessagingService extends Service implements NewGameMessageHandl
 {
     private static final String MQTT_TOPIC_KILLED = "something/killed/";
     private static final String MQTT_TOPIC_ATTACK_RESPONSE = "something/attResponse/";
+    private static final String MQTT_TOPIC_NEWS = "something/news/";
+
+    public static final String MQTT_TOPIC_REQUEST_NEWS = "something/requestNews";
     public static final String MQTT_TOPIC_LOCATION_UPDATE = "something/locationUpdate";
     public static final String MQTT_TOPIC_ATTACK = "something/attack";
 
@@ -51,6 +55,7 @@ public class GameMessagingService extends Service implements NewGameMessageHandl
                 MessagingUtils messagingUtils = MessagingUtils.getMessagingUtils();
                 messagingUtils.subscribeToTopic(MQTT_TOPIC_KILLED + username,thisMessageHandler);
                 messagingUtils.subscribeToTopic(MQTT_TOPIC_ATTACK_RESPONSE + username,thisMessageHandler);
+                messagingUtils.subscribeToTopic(MQTT_TOPIC_NEWS + username, thisMessageHandler);
                 messagingUtils.setConnectionLostHandler(thisConnectionLostHandler);
             }
         }).run();
@@ -92,6 +97,10 @@ public class GameMessagingService extends Service implements NewGameMessageHandl
                 else if(topic.contains(MQTT_TOPIC_ATTACK_RESPONSE))
                 {
                     handleAttackResponseMessage(message);
+                }
+                else if(topic.contains(MQTT_TOPIC_NEWS))
+                {
+                    handleNewsMessage(message);
                 }
             }
         });
@@ -156,6 +165,14 @@ public class GameMessagingService extends Service implements NewGameMessageHandl
         broadcastMessageIntent.setAction(GameMessageReciever.ACTION_HANDLE_ATTACK_RESPONSE_MESSAGE);
         broadcastMessageIntent.putExtra("responseType", responseResult);
         broadcastMessageIntent.putExtra("attackerMessage",messageToDisplay);
+        sendOrderedBroadcast(broadcastMessageIntent,null);
+    }
+
+    private void handleNewsMessage(MqttMessage newsMessage)
+    {
+        Intent broadcastMessageIntent = new Intent();
+        broadcastMessageIntent.setAction(MainActivity.ACTION_HANDLE_NEWS_MESSAGE);
+        broadcastMessageIntent.putExtra("news",new String(newsMessage.getPayload()));
         sendOrderedBroadcast(broadcastMessageIntent,null);
     }
 

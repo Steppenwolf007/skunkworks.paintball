@@ -21,10 +21,14 @@ import com.something.liberty.location.LocationUtils;
 import com.something.liberty.location.ReportLocationService;
 import com.something.liberty.messaging.GameMessageReciever;
 import com.something.liberty.messaging.GameMessagingService;
+import com.something.liberty.messaging.SendJsonToTopicTask;
 import com.something.liberty.messaging.SendMessage;
+
+import org.json.JSONObject;
 
 public class MainActivity extends ActionBarActivity {
 
+    public static final String ACTION_HANDLE_NEWS_MESSAGE = "HANDLE_NEWS_MESSAGE";
     private BroadcastReceiver gameMessageBroadcastReceiver = null;
     private IntentFilter gameMessageIntentFilter = null;
 
@@ -98,12 +102,18 @@ public class MainActivity extends ActionBarActivity {
                     String message = intent.getStringExtra("attackerMessage");
                     showMessageDialog(title,message);
                 }
+                else if(ACTION_HANDLE_NEWS_MESSAGE.equals(intent.getAction()))
+                {
+                    String news = intent.getStringExtra("news");
+                    showMessageDialog("news",news);
+                }
                 abortBroadcast();
             }
         };
         gameMessageIntentFilter = new IntentFilter();
         gameMessageIntentFilter.addAction(GameMessageReciever.ACTION_HANDLE_ATTACK_RESPONSE_MESSAGE);
         gameMessageIntentFilter.addAction(GameMessageReciever.ACTION_HANDLE_KILLED_MESSAGE);
+        gameMessageIntentFilter.addAction(ACTION_HANDLE_NEWS_MESSAGE);
         gameMessageIntentFilter.setPriority(10);
     }
 
