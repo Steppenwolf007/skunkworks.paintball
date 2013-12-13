@@ -106,6 +106,10 @@ public class MainActivity extends ActionBarActivity {
                 {
                     String news = intent.getStringExtra("news");
                     showMessageDialog("news",news);
+                else if(GameMessageReciever.ACTION_HANDLE_OUTGUNNER_MESSAGE.equals(intent.getAction()))
+                {
+                    String message = intent.getStringExtra("message");
+                    showMessageDialog("Self Defence",message);
                 }
                 abortBroadcast();
             }
@@ -114,6 +118,7 @@ public class MainActivity extends ActionBarActivity {
         gameMessageIntentFilter.addAction(GameMessageReciever.ACTION_HANDLE_ATTACK_RESPONSE_MESSAGE);
         gameMessageIntentFilter.addAction(GameMessageReciever.ACTION_HANDLE_KILLED_MESSAGE);
         gameMessageIntentFilter.addAction(ACTION_HANDLE_NEWS_MESSAGE);
+        gameMessageIntentFilter.addAction(GameMessageReciever.ACTION_HANDLE_OUTGUNNER_MESSAGE);
         gameMessageIntentFilter.setPriority(10);
     }
 

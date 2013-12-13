@@ -20,6 +20,7 @@ public class GameMessagingService extends Service implements NewGameMessageHandl
     private static final String MQTT_TOPIC_KILLED = "something/killed/";
     private static final String MQTT_TOPIC_ATTACK_RESPONSE = "something/attResponse/";
     private static final String MQTT_TOPIC_NEWS = "something/news/";
+    private static final String MQTT_TOPIC_OUTGUNNER = "something/outgunner/";
 
     public static final String MQTT_TOPIC_REQUEST_NEWS = "something/requestNews";
     public static final String MQTT_TOPIC_LOCATION_UPDATE = "something/locationUpdate";
@@ -56,6 +57,7 @@ public class GameMessagingService extends Service implements NewGameMessageHandl
                 messagingUtils.subscribeToTopic(MQTT_TOPIC_KILLED + username,thisMessageHandler);
                 messagingUtils.subscribeToTopic(MQTT_TOPIC_ATTACK_RESPONSE + username,thisMessageHandler);
                 messagingUtils.subscribeToTopic(MQTT_TOPIC_NEWS + username, thisMessageHandler);
+                messagingUtils.subscribeToTopic(MQTT_TOPIC_OUTGUNNER + username,thisMessageHandler);
                 messagingUtils.setConnectionLostHandler(thisConnectionLostHandler);
             }
         }).run();
@@ -101,6 +103,10 @@ public class GameMessagingService extends Service implements NewGameMessageHandl
                 else if(topic.contains(MQTT_TOPIC_NEWS))
                 {
                     handleNewsMessage(message);
+                }
+                else if(topic.contains(MQTT_TOPIC_OUTGUNNER))
+                {
+                    handleOutgunnerMessage(message);
                 }
             }
         });
@@ -173,6 +179,27 @@ public class GameMessagingService extends Service implements NewGameMessageHandl
         Intent broadcastMessageIntent = new Intent();
         broadcastMessageIntent.setAction(MainActivity.ACTION_HANDLE_NEWS_MESSAGE);
         broadcastMessageIntent.putExtra("news",new String(newsMessage.getPayload()));
+        sendOrderedBroadcast(broadcastMessageIntent,null);
+    }
+
+    private void handleOutgunnerMessage(MqttMessage outgunnerMessage)
+    {
+        String messageString = null;
+        try
+        {
+            JSONObject payloadObject = new JSONObject(new String(outgunnerMessage.getPayload()));
+            messageString = payloadObject.getString("message");
+        }
+        catch(JSONException e)
+        {
+            e.printStackTrace();
+            Log.e("SomethingLiberty","Failed to parse outgunner message");
+            return;
+        }
+
+        Intent broadcastMessageIntent = new Intent();
+        broadcastMessageIntent.putExtra("message",messageString);
+        broadcastMessageIntent.setAction(GameMessageReciever.ACTION_HANDLE_OUTGUNNER_MESSAGE);
         sendOrderedBroadcast(broadcastMessageIntent,null);
     }
 

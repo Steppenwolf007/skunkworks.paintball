@@ -11,6 +11,7 @@ public class GameMessageReciever extends BroadcastReceiver {
 
     public static String ACTION_HANDLE_ATTACK_RESPONSE_MESSAGE = "HANDLE_ATTACK_RESPONSE_MESSAGE";
     public static String ACTION_HANDLE_KILLED_MESSAGE = "HANDLE_KILLED_MESSAGE";
+    public static String ACTION_HANDLE_OUTGUNNER_MESSAGE = "HANDLE_OUTGUNNER_MESSAGE";
 
     public GameMessageReciever() {
     }
@@ -29,6 +30,11 @@ public class GameMessageReciever extends BroadcastReceiver {
         {
             String message = intent.getStringExtra("message");
             notificationUtils.displayGenericNotification("Killed",message);
+        }
+        else if(ACTION_HANDLE_OUTGUNNER_MESSAGE.equals(intent.getAction()))
+        {
+            String message = intent.getStringExtra("message");
+            notificationUtils.displayGenericNotification("Self Defence",message);
         }
 
     }
