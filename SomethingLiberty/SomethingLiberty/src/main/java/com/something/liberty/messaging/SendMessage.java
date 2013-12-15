@@ -1,10 +1,6 @@
 package com.something.liberty.messaging;
 
-import android.content.ComponentName;
 import android.content.Context;
-import android.content.Intent;
-import android.content.ServiceConnection;
-import android.os.IBinder;
 import android.util.Log;
 
 import com.something.liberty.UserUtils;
@@ -36,21 +32,19 @@ public class SendMessage
 
     public static void sendLocationUpdate(Context context,double longitude,double latitude)
     {
-        Intent serviceIntent = new Intent(context,GameMessagingService.class);
-        serviceIntent.setAction(GameMessagingService.ACTION_UPDATE_LOCATION);
-        serviceIntent.putExtra("longitude",longitude);
-        serviceIntent.putExtra("latitude",latitude);
-        context.bindService(serviceIntent,new ServiceConnection() {
-            @Override
-            public void onServiceConnected(ComponentName name, IBinder service) {
-
-            }
-
-            @Override
-            public void onServiceDisconnected(ComponentName name) {
-
-            }
-        },Context.BIND_AUTO_CREATE);
+        JSONObject request = new JSONObject();
+        try
+        {
+            request.put("longitude",longitude);
+            request.put("latitude",latitude);
+            request.put("username",UserUtils.getUsername(context));
+        }
+        catch(JSONException e)
+        {
+            Log.e("SomethingLiberty","Failed to send location update");
+            e.printStackTrace();
+        }
+        new SendJsonToTopicTask(GameMessagingService.MQTT_TOPIC_LOCATION_UPDATE).execute(request);
     }
 
     public static void sendNewsRequest(Context context)

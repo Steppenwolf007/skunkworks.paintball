@@ -37,17 +37,13 @@ public class ReportLocationService extends Service {
     private void reportLocation()
     {
         Log.i("SomethingLiberty", "Requesting location update from device");
-
         LocationManager locationManager = (LocationManager) getSystemService(Service.LOCATION_SERVICE);
         locationManager.requestSingleUpdate(LocationManager.GPS_PROVIDER,new LocationListener() {
             @Override
             public void onLocationChanged(Location location) {
                 Log.i("SomethingLiberty","Received location update from device");
-                PowerManager powerManager = (PowerManager) getSystemService(Service.POWER_SERVICE);
-                PowerManager.WakeLock wakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK,"SomethingLibertyLocations");
-                wakeLock.acquire();
+
                 SendMessage.sendLocationUpdate(getApplicationContext(),location.getLongitude(),location.getLatitude());
-                wakeLock.release();
             }
 
             @Override
