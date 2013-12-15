@@ -168,4 +168,14 @@ class MessagingUtils implements MqttCallback
     {
         throw new CloneNotSupportedException("Singleton Instance");
     }
+
+    static interface NewGameMessageHandler
+    {
+        void onNewGameMessage(String topic, MqttMessage message);
+    }
+
+    static interface ConnectionLostHandler
+    {
+        void onConnectionLost(Throwable throwable);
+    }
 }

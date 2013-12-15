@@ -15,7 +15,7 @@ import org.eclipse.paho.client.mqttv3.MqttMessage;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-public class GameMessagingService extends Service implements NewGameMessageHandler, ConnectionLostHandler
+public class GameMessagingService extends Service implements MessagingUtils.NewGameMessageHandler, MessagingUtils.ConnectionLostHandler
 {
     private static final String MQTT_TOPIC_KILLED = "something/killed/";
     private static final String MQTT_TOPIC_ATTACK_RESPONSE = "something/attResponse/";
@@ -41,8 +41,8 @@ public class GameMessagingService extends Service implements NewGameMessageHandl
         Toast.makeText(getApplicationContext(),"Service started",Toast.LENGTH_SHORT).show();
         uiThreadHandler = new Handler();
 
-        final ConnectionLostHandler thisConnectionLostHandler = this;
-        final NewGameMessageHandler thisMessageHandler = this;
+        final MessagingUtils.ConnectionLostHandler thisConnectionLostHandler = this;
+        final MessagingUtils.NewGameMessageHandler thisMessageHandler = this;
         final String username = UserUtils.getUsername(this);
         new Thread(new Runnable(){
             @Override
