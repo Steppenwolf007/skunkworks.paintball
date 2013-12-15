@@ -10,6 +10,9 @@ import org.json.JSONObject;
 
 public class SendMessage
 {
+    private static final String MQTT_TOPIC_REQUEST_NEWS = "something/requestNews";
+    private static final String MQTT_TOPIC_LOCATION_UPDATE = "something/locationUpdate";
+    private static final String MQTT_TOPIC_ATTACK = "something/attack";
 
     public static void sendAttackMessage(Context context,double longitude,double latitude)
     {
@@ -27,7 +30,7 @@ public class SendMessage
             e.printStackTrace();
             return;
         }
-        new SendJsonToTopicTask(GameMessagingService.MQTT_TOPIC_ATTACK).execute(locationUpdate);
+        new SendJsonToTopicTask(MQTT_TOPIC_ATTACK).execute(locationUpdate);
     }
 
     public static void sendLocationUpdate(Context context,double longitude,double latitude)
@@ -44,7 +47,7 @@ public class SendMessage
             Log.e("SomethingLiberty","Failed to send location update");
             e.printStackTrace();
         }
-        new SendJsonToTopicTask(GameMessagingService.MQTT_TOPIC_LOCATION_UPDATE).execute(request);
+        new SendJsonToTopicTask(MQTT_TOPIC_LOCATION_UPDATE).execute(request);
     }
 
     public static void sendNewsRequest(Context context)
@@ -59,6 +62,6 @@ public class SendMessage
             Log.e("SomethingLiberty","Failed to request news");
             e.printStackTrace();
         }
-        new SendJsonToTopicTask(GameMessagingService.MQTT_TOPIC_REQUEST_NEWS).execute(request);
+        new SendJsonToTopicTask(MQTT_TOPIC_REQUEST_NEWS).execute(request);
     }
 }

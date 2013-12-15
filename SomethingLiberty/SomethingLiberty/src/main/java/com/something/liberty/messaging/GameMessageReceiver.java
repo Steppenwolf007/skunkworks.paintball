@@ -7,19 +7,21 @@ import android.util.Log;
 
 import com.something.liberty.alerts.NotificationUtils;
 
-public class GameMessageReciever extends BroadcastReceiver {
+public class GameMessageReceiver extends BroadcastReceiver {
 
     public static String ACTION_HANDLE_ATTACK_RESPONSE_MESSAGE = "HANDLE_ATTACK_RESPONSE_MESSAGE";
     public static String ACTION_HANDLE_KILLED_MESSAGE = "HANDLE_KILLED_MESSAGE";
     public static String ACTION_HANDLE_OUTGUNNER_MESSAGE = "HANDLE_OUTGUNNER_MESSAGE";
 
-    public GameMessageReciever() {
+    public GameMessageReceiver()
+    {
     }
 
     @Override
-    public void onReceive(Context context, Intent intent) {
+    public void onReceive(Context context, Intent intent)
+    {
         NotificationUtils notificationUtils = new NotificationUtils(context);
-        Log.i("SomethingLiberty","in receiver");
+
         if(ACTION_HANDLE_ATTACK_RESPONSE_MESSAGE.equals(intent.getAction()))
         {
             String responseType = intent.getStringExtra("responseType");

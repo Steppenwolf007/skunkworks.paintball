@@ -5,7 +5,7 @@ import android.util.Log;
 
 import org.json.JSONObject;
 
-public class SendJsonToTopicTask extends AsyncTask<JSONObject,Void,Void> {
+class SendJsonToTopicTask extends AsyncTask<JSONObject,Void,Void> {
 
     private String mTopic = null;
 

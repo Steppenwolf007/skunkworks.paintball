@@ -22,19 +22,14 @@ public class GameMessagingService extends Service implements NewGameMessageHandl
     private static final String MQTT_TOPIC_NEWS = "something/news/";
     private static final String MQTT_TOPIC_OUTGUNNER = "something/outgunner/";
 
-    public static final String MQTT_TOPIC_REQUEST_NEWS = "something/requestNews";
-    public static final String MQTT_TOPIC_LOCATION_UPDATE = "something/locationUpdate";
-    public static final String MQTT_TOPIC_ATTACK = "something/attack";
-
-    public static final String ACTION_UPDATE_LOCATION = "UPDATE_LOCATION";
-    public static final String ACTION_ATTACK = "ATTACK";
-
     private Handler uiThreadHandler = null;
     private PowerManager.WakeLock wakeLock = null;
 
     @Override
-    public void onCreate() {
+    public void onCreate()
+    {
         super.onCreate();
+
         PowerManager powerManager = (PowerManager) getSystemService(Service.POWER_SERVICE);
         wakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK,"SomethingLibertyWakeLock");
         wakeLock.acquire();
@@ -69,28 +64,17 @@ public class GameMessagingService extends Service implements NewGameMessageHandl
     @Override
     public IBinder onBind(Intent intent)
     {
-        if(ACTION_UPDATE_LOCATION.equals(intent.getAction()))
-        {
-            double latitude = intent.getDoubleExtra("latitude",0);
-            double longitude = intent.getDoubleExtra("longitude",0);
-            if(latitude != 0 && longitude != 0)
-            {
-                sendLocationUpdate(latitude,longitude);
-            }
-        }
         return null;
     }
 
     @Override
     public void onNewGameMessage(final String topic, final MqttMessage message)
     {
-        final Service thisService = this;
         uiThreadHandler.post(new Runnable() {
             @Override
             public void run() {
                 String messageString = new String(message.getPayload());
                 Log.i("SomethingLiberty", "GameMessagingService : received : " + messageString);
-                Toast.makeText(thisService,messageString,Toast.LENGTH_SHORT).show();
 
                 if(topic.contains(MQTT_TOPIC_KILLED))
                 {
@@ -143,7 +127,7 @@ public class GameMessagingService extends Service implements NewGameMessageHandl
         }
 
         Intent broadcastMessageIntent = new Intent();
-        broadcastMessageIntent.setAction(GameMessageReciever.ACTION_HANDLE_KILLED_MESSAGE);
+        broadcastMessageIntent.setAction(GameMessageReceiver.ACTION_HANDLE_KILLED_MESSAGE);
         broadcastMessageIntent.putExtra("message",messageToDisplay);
         sendOrderedBroadcast(broadcastMessageIntent, null);
     }
@@ -168,7 +152,7 @@ public class GameMessagingService extends Service implements NewGameMessageHandl
         }
 
         Intent broadcastMessageIntent = new Intent();
-        broadcastMessageIntent.setAction(GameMessageReciever.ACTION_HANDLE_ATTACK_RESPONSE_MESSAGE);
+        broadcastMessageIntent.setAction(GameMessageReceiver.ACTION_HANDLE_ATTACK_RESPONSE_MESSAGE);
         broadcastMessageIntent.putExtra("responseType", responseResult);
         broadcastMessageIntent.putExtra("attackerMessage",messageToDisplay);
         sendOrderedBroadcast(broadcastMessageIntent,null);
@@ -199,31 +183,9 @@ public class GameMessagingService extends Service implements NewGameMessageHandl
 
         Intent broadcastMessageIntent = new Intent();
         broadcastMessageIntent.putExtra("message",messageString);
-        broadcastMessageIntent.setAction(GameMessageReciever.ACTION_HANDLE_OUTGUNNER_MESSAGE);
+        broadcastMessageIntent.setAction(GameMessageReceiver.ACTION_HANDLE_OUTGUNNER_MESSAGE);
         sendOrderedBroadcast(broadcastMessageIntent,null);
     }
-
-    private void sendLocationUpdate(double latitude, double longitude)
-    {
-        JSONObject locationUpdate = null;
-        try
-        {
-            locationUpdate = new JSONObject();
-            locationUpdate.put("latitude",latitude);
-            locationUpdate.put("longitude",longitude);
-            locationUpdate.put("username", UserUtils.getUsername(this));
-        }
-        catch(JSONException e)
-        {
-            Log.e("SomethingLiberty","GameMessagingServer : failed to create location update message");
-            e.printStackTrace();
-            return;
-        }
-        MessagingUtils messagingUtils = MessagingUtils.getMessagingUtils();
-        messagingUtils.sendMessage(MQTT_TOPIC_LOCATION_UPDATE,locationUpdate.toString());
-    }
-
-
 
     @Override
     public void onDestroy() {

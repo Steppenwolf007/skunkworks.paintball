@@ -21,7 +21,7 @@ import android.webkit.WebView;
 
 import com.something.liberty.location.LocationUtils;
 import com.something.liberty.location.ReportLocationService;
-import com.something.liberty.messaging.GameMessageReciever;
+import com.something.liberty.messaging.GameMessageReceiver;
 import com.something.liberty.messaging.GameMessagingService;
 import com.something.liberty.messaging.SendMessage;
 
@@ -35,11 +35,13 @@ import java.util.Date;
 public class MainActivity extends ActionBarActivity {
 
     public static final String ACTION_HANDLE_NEWS_MESSAGE = "HANDLE_NEWS_MESSAGE";
+
     private BroadcastReceiver gameMessageBroadcastReceiver = null;
     private IntentFilter gameMessageIntentFilter = null;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(Bundle savedInstanceState)
+    {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
@@ -65,13 +67,15 @@ public class MainActivity extends ActionBarActivity {
     }
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
+    public boolean onCreateOptionsMenu(Menu menu)
+    {
         getMenuInflater().inflate(R.menu.main, menu);
         return true;
     }
 
     @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
+    public boolean onOptionsItemSelected(MenuItem item)
+    {
         switch(item.getItemId())
         {
             case R.id.action_attack:
@@ -102,13 +106,13 @@ public class MainActivity extends ActionBarActivity {
         gameMessageBroadcastReceiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
-                if(GameMessageReciever.ACTION_HANDLE_KILLED_MESSAGE.equals(intent.getAction()))
+                if(GameMessageReceiver.ACTION_HANDLE_KILLED_MESSAGE.equals(intent.getAction()))
                 {
                     String title = "Killed";
                     String message = intent.getStringExtra("message");
                     showMessageDialog(title,message);
                 }
-                else if(GameMessageReciever.ACTION_HANDLE_ATTACK_RESPONSE_MESSAGE.equals(intent.getAction()))
+                else if(GameMessageReceiver.ACTION_HANDLE_ATTACK_RESPONSE_MESSAGE.equals(intent.getAction()))
                 {
                     String title = intent.getStringExtra("responseType");
                     String message = intent.getStringExtra("attackerMessage");
@@ -119,7 +123,7 @@ public class MainActivity extends ActionBarActivity {
                     String news = intent.getStringExtra("news");
                     displayNewsOnMap(news);
                 }
-                else if(GameMessageReciever.ACTION_HANDLE_OUTGUNNER_MESSAGE.equals(intent.getAction()))
+                else if(GameMessageReceiver.ACTION_HANDLE_OUTGUNNER_MESSAGE.equals(intent.getAction()))
                 {
                     String message = intent.getStringExtra("message");
                     showMessageDialog("Self Defence",message);
@@ -128,10 +132,10 @@ public class MainActivity extends ActionBarActivity {
             }
         };
         gameMessageIntentFilter = new IntentFilter();
-        gameMessageIntentFilter.addAction(GameMessageReciever.ACTION_HANDLE_ATTACK_RESPONSE_MESSAGE);
-        gameMessageIntentFilter.addAction(GameMessageReciever.ACTION_HANDLE_KILLED_MESSAGE);
+        gameMessageIntentFilter.addAction(GameMessageReceiver.ACTION_HANDLE_ATTACK_RESPONSE_MESSAGE);
+        gameMessageIntentFilter.addAction(GameMessageReceiver.ACTION_HANDLE_KILLED_MESSAGE);
         gameMessageIntentFilter.addAction(ACTION_HANDLE_NEWS_MESSAGE);
-        gameMessageIntentFilter.addAction(GameMessageReciever.ACTION_HANDLE_OUTGUNNER_MESSAGE);
+        gameMessageIntentFilter.addAction(GameMessageReceiver.ACTION_HANDLE_OUTGUNNER_MESSAGE);
         gameMessageIntentFilter.setPriority(10);
     }
 
@@ -191,18 +195,21 @@ public class MainActivity extends ActionBarActivity {
     }
 
     @Override
-    protected void onStop() {
+    protected void onStop()
+    {
         super.onStop();
     }
 
     @Override
-    protected void onPause() {
+    protected void onPause()
+    {
         super.onPause();
         unregisterReceiver(gameMessageBroadcastReceiver);
     }
 
     @Override
-    protected void onResume() {
+    protected void onResume()
+    {
         super.onResume();
         registerReceiver(gameMessageBroadcastReceiver,gameMessageIntentFilter);
         SendMessage.sendNewsRequest(this);
@@ -210,7 +217,8 @@ public class MainActivity extends ActionBarActivity {
 
     AlertDialog currentlyDisplayedEvent = null;
     @JavascriptInterface
-    public void showEventDialog(String message) {
+    public void showEventDialog(String message)
+    {
 
         if(currentlyDisplayedEvent == null || !currentlyDisplayedEvent.isShowing())
         {
@@ -220,6 +228,4 @@ public class MainActivity extends ActionBarActivity {
             currentlyDisplayedEvent = builder.show();
         }
     }
-
-
 }

@@ -37,7 +37,7 @@
             android:exported="false" />
 
         <receiver
-            android:name=".messaging.GameMessageReciever"
+            android:name=".messaging.GameMessageReceiver"
             android:enabled="true"
             android:exported="false">
             <intent-filter android:priority="5">

@@ -52,7 +52,7 @@ class MessagingUtils implements MqttCallback
         {
             mMqttClient.connect();
             mMqttClient.setCallback(this);
-            Log.i("SomethingLiberty","Connected to broker : " + BrokerDetails.MQTT_BROKER_URL);
+            Log.i("SomethingLiberty","Connected to broker : " + MQTT_BROKER_URL);
         }
     }
 
@@ -83,8 +83,8 @@ class MessagingUtils implements MqttCallback
             e.printStackTrace();
             return;
         }
-        Log.i("SomethingLiberty","Sent message : " + messageString + " to topic : " + topicString);
 
+        Log.i("SomethingLiberty","Sent message : " + messageString + " to topic : " + topicString);
     }
 
     public void subscribeToTopic(String topic,NewGameMessageHandler callback)
