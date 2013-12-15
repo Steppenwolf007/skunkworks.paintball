@@ -29,17 +29,28 @@ makeLonLat = function(longitude,latitude)
 	return lonlat;
 }
 
-placeMarker = function(lonLat)
+placeMarker = function(message,lonLat)
 {
 	var size = new OpenLayers.Size(21,25);
 	var offset = new OpenLayers.Pixel(-(size.w/2), -size.h);
-	var icon = new OpenLayers.Icon('http://www.openlayers.org/dev/img/marker.png', size, offset);
+	var icon = new OpenLayers.Icon('marker.png', size, offset);
 	var marker = new OpenLayers.Marker(lonLat,icon);
+
 	markerLayer.addMarker(marker);
+
+    markerLayer.events.register('touchend',marker,function()
+    {
+        Android.showEventDialog(message);
+    });
 }
 
-displayEvent = function(longitude,latitude)
+addEvent = function(message,longitude,latitude)
 {
 	var lonlat = makeLonLat(longitude,latitude);
-	placeMarker(lonlat);
+	placeMarker(message,lonlat);
+}
+
+removeAllEvents = function()
+{
+    markerLayer.clearMarkers();
 }

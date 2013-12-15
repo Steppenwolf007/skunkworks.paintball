@@ -12,8 +12,10 @@ import android.location.Location;
 import android.os.SystemClock;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.webkit.JavascriptInterface;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 
@@ -21,10 +23,14 @@ import com.something.liberty.location.LocationUtils;
 import com.something.liberty.location.ReportLocationService;
 import com.something.liberty.messaging.GameMessageReciever;
 import com.something.liberty.messaging.GameMessagingService;
-import com.something.liberty.messaging.SendJsonToTopicTask;
 import com.something.liberty.messaging.SendMessage;
 
+import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 public class MainActivity extends ActionBarActivity {
 
@@ -53,6 +59,7 @@ public class MainActivity extends ActionBarActivity {
         // webSettings.setAllowContentAccess(true);
         webSettings.setAllowFileAccess(true);
         webView.loadUrl("file:///android_asset/index.html");
+        webView.addJavascriptInterface(this, "Android");
 
         setupGameMessageReciever();
     }
@@ -77,12 +84,17 @@ public class MainActivity extends ActionBarActivity {
             return true;
         }
         return super.onOptionsItemSelected(item);
-    }
 
-    private void addMarker(double longitude,double latitude)
+    private void removeAllEventsFromMap()
     {
         WebView webView = (WebView) findViewById(R.id.webView);
-        webView.loadUrl("javascript:displayEvent(" + longitude + "," + latitude + ")");
+        webView.loadUrl("javascript:removeAllEvents()");
+    }
+
+    private void addEventToMap(String message, double longitude, double latitude)
+    {
+        WebView webView = (WebView) findViewById(R.id.webView);
+        webView.loadUrl("javascript:addEvent('" + message + "'," + longitude + "," + latitude + ")");
     }
 
     private void setupGameMessageReciever()
@@ -105,7 +117,8 @@ public class MainActivity extends ActionBarActivity {
                 else if(ACTION_HANDLE_NEWS_MESSAGE.equals(intent.getAction()))
                 {
                     String news = intent.getStringExtra("news");
-                    showMessageDialog("news",news);
+                    displayNewsOnMap(news);
+                }
                 else if(GameMessageReciever.ACTION_HANDLE_OUTGUNNER_MESSAGE.equals(intent.getAction()))
                 {
                     String message = intent.getStringExtra("message");
@@ -130,6 +143,53 @@ public class MainActivity extends ActionBarActivity {
         builder.show();
     }
 
+    private void displayNewsOnMap(String news)
+    {
+        removeAllEventsFromMap();
+        try
+        {
+            JSONArray newsArray = new JSONArray(news);
+            for(int i=0; i < newsArray.length();i++)
+            {
+                JSONObject currentNewsItem = (JSONObject) newsArray.get(i);
+
+                JSONObject location = currentNewsItem.getJSONObject("location");
+                double longitude = location.getDouble("longitude");
+                double latitude = location.getDouble("latitude");
+
+                String eventType = currentNewsItem.getString("type");
+                String attackerUsername = currentNewsItem.getString("attackerUsername");
+
+                long timeMilis = currentNewsItem.getLong("timeOccurred");
+                Date date = new Date(timeMilis);
+
+                SimpleDateFormat dateFormat = new SimpleDateFormat("hh:mm a");
+                String whatHappened = "";
+                
+                if(eventType.equals("PLAYER_OUTGUNNED"))
+                {
+                    whatHappened = "Was Outgunned Here";
+                }
+                else if(eventType.equals("PLAYER_MISS"))
+                {
+                    whatHappened = "Missed Here";
+                }
+                else if(eventType.equals("PLAYER_HIT"))
+                {
+                    whatHappened = "Killed Here";
+                }
+
+                String message = attackerUsername + " " + whatHappened + " at " + dateFormat.format(date);
+                addEventToMap(message, longitude, latitude);
+            }
+        }
+        catch(JSONException e)
+        {
+            e.printStackTrace();
+            Log.e("SomethingLiberty","Failed to parse news");
+        }
+    }
+
     @Override
     protected void onStop() {
         super.onStop();
@@ -145,6 +205,20 @@ public class MainActivity extends ActionBarActivity {
     protected void onResume() {
         super.onResume();
         registerReceiver(gameMessageBroadcastReceiver,gameMessageIntentFilter);
+        SendMessage.sendNewsRequest(this);
+    }
+
+    AlertDialog currentlyDisplayedEvent = null;
+    @JavascriptInterface
+    public void showEventDialog(String message) {
+
+        if(currentlyDisplayedEvent == null || !currentlyDisplayedEvent.isShowing())
+        {
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setTitle("Event");
+            builder.setMessage(message);
+            currentlyDisplayedEvent = builder.show();
+        }
     }
 
 
