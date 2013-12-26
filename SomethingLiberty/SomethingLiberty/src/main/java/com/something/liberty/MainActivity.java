@@ -18,6 +18,7 @@ import android.view.MenuItem;
 import android.webkit.JavascriptInterface;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
+import android.widget.Toast;
 
 import com.something.liberty.location.LocationUtils;
 import com.something.liberty.location.ReportLocationService;
@@ -81,7 +82,14 @@ public class MainActivity extends ActionBarActivity {
             case R.id.action_attack:
                 LocationUtils locationUtils = new LocationUtils(this);
                 Location lastKnownLocation = locationUtils.getLastKnownLocation();
-                SendMessage.sendAttackMessage(this,lastKnownLocation.getLongitude(),lastKnownLocation.getLatitude());
+                if(lastKnownLocation != null)
+                {
+                    SendMessage.sendAttackMessage(this,lastKnownLocation.getLongitude(),lastKnownLocation.getLatitude());
+                }
+                else
+                {
+                    Toast.makeText(this,getResources().getString(R.string.no_known_location),Toast.LENGTH_SHORT).show();
+                }
                 break;
             case R.id.action_settings:
 
@@ -228,4 +236,5 @@ public class MainActivity extends ActionBarActivity {
             currentlyDisplayedEvent = builder.show();
         }
     }
+
 }
