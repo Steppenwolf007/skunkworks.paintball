@@ -46,6 +46,8 @@ public class MainActivity extends ActionBarActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        UserUtils.updateUsernameIfUnset(this);
+
         // start messaging service
         Intent intent = new Intent(this,GameMessagingService.class);
         startService(intent);
