@@ -13,6 +13,7 @@ public abstract class MapIconUtils
     private static HashMap<String,String> colourIconSrcMap = new HashMap<String,String>();
     static
     {
+        colourIconSrcMap.put(NEWS_TYPE_HIT + "#FFFFFF","hit-white.png");
         colourIconSrcMap.put(NEWS_TYPE_HIT + "#000000","hit-black.png");
         colourIconSrcMap.put(NEWS_TYPE_HIT + "#FF0000","hit-red.png");
         colourIconSrcMap.put(NEWS_TYPE_HIT + "#FFA500","hit-orange.png");
@@ -21,6 +22,7 @@ public abstract class MapIconUtils
         colourIconSrcMap.put(NEWS_TYPE_HIT + "#0000FF","hit-blue.png");
         colourIconSrcMap.put(NEWS_TYPE_HIT + "#4B0082","hit-indigo.png");
 
+        colourIconSrcMap.put(NEWS_TYPE_MISS + "#FFFFFF","miss-white.png");
         colourIconSrcMap.put(NEWS_TYPE_MISS + "#000000","miss-black.png");
         colourIconSrcMap.put(NEWS_TYPE_MISS + "#FF0000","miss-red.png");
         colourIconSrcMap.put(NEWS_TYPE_MISS + "#FFA500","miss-orange.png");
