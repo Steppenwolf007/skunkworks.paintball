@@ -14,18 +14,17 @@ import java.util.Map;
 
 class MessagingUtils implements MqttCallback
 {
-    private static final String MQTT_CLIENT_ID = "SomethingClient";
     private static final String MQTT_BROKER_URL = BrokerDetails.MQTT_BROKER_URL;
 
     private static MessagingUtils mMessagingUtils = null;
 
-    public static synchronized MessagingUtils getMessagingUtils()
+    public static synchronized MessagingUtils getMessagingUtils(String mqttClientId)
     {
         if(mMessagingUtils == null)
         {
             try
             {
-                mMessagingUtils = new MessagingUtils();
+                mMessagingUtils = new MessagingUtils(mqttClientId);
             }
             catch(MqttException e)
             {
@@ -39,11 +38,13 @@ class MessagingUtils implements MqttCallback
     private MqttClient mMqttClient = null;
     private ConnectionLostHandler mConnectionLostHandler = null;
     private Map<String,NewGameMessageHandler> topicHandlerMap = new HashMap<String, NewGameMessageHandler>();
+    private String mqttClientId = null;
 
-    private MessagingUtils() throws MqttException
+    private MessagingUtils(String clientId) throws MqttException
     {
+        this.mqttClientId = clientId;
         MemoryPersistence persistence = new MemoryPersistence();
-        mMqttClient = new MqttClient(MQTT_BROKER_URL,MQTT_CLIENT_ID,persistence);
+        mMqttClient = new MqttClient(MQTT_BROKER_URL,mqttClientId,persistence);
     }
 
     public synchronized void connectToBroker() throws MqttException

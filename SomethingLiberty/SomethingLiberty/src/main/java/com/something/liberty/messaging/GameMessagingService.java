@@ -48,7 +48,7 @@ public class GameMessagingService extends Service implements MessagingUtils.NewG
             @Override
             public void run() {
 
-                MessagingUtils messagingUtils = MessagingUtils.getMessagingUtils();
+                MessagingUtils messagingUtils = MessagingUtils.getMessagingUtils(UserUtils.getUsername(GameMessagingService.this));
                 messagingUtils.subscribeToTopic(MQTT_TOPIC_KILLED + username,thisMessageHandler);
                 messagingUtils.subscribeToTopic(MQTT_TOPIC_ATTACK_RESPONSE + username,thisMessageHandler);
                 messagingUtils.subscribeToTopic(MQTT_TOPIC_NEWS + username, thisMessageHandler);
@@ -104,7 +104,7 @@ public class GameMessagingService extends Service implements MessagingUtils.NewG
             @Override
             public void run() {
                 Log.i("SomethingLiberty", "GameMessagingService : Client disconnected : " + cause.getMessage());
-                Toast.makeText(thisService,"Lost Mqtt connection",Toast.LENGTH_SHORT).show();
+                Toast.makeText(thisService,"Lost MQTT connection",Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -117,7 +117,7 @@ public class GameMessagingService extends Service implements MessagingUtils.NewG
         {
             JSONObject payloadObject = null;
             payloadObject = new JSONObject(payloadString);
-            messageToDisplay = payloadObject.getString("message");
+            messageToDisplay = payloadObject.getString(GameMessageReceiver.EXTRA_MESSAGE);
         }
         catch(JSONException e)
         {
@@ -128,7 +128,7 @@ public class GameMessagingService extends Service implements MessagingUtils.NewG
 
         Intent broadcastMessageIntent = new Intent();
         broadcastMessageIntent.setAction(GameMessageReceiver.ACTION_HANDLE_KILLED_MESSAGE);
-        broadcastMessageIntent.putExtra("message",messageToDisplay);
+        broadcastMessageIntent.putExtra(GameMessageReceiver.EXTRA_MESSAGE,messageToDisplay);
         sendOrderedBroadcast(broadcastMessageIntent, null);
     }
 
@@ -141,8 +141,8 @@ public class GameMessagingService extends Service implements MessagingUtils.NewG
         {
             JSONObject payloadObject = null;
             payloadObject = new JSONObject(payloadString);
-            responseResult = payloadObject.getString("responseType");
-            messageToDisplay = payloadObject.getString("attackerMessage");
+            responseResult = payloadObject.getString(GameMessageReceiver.EXTRA_RESPONSE_TYPE);
+            messageToDisplay = payloadObject.getString(GameMessageReceiver.EXTRA_ATTACKER_MESSAGE);
         }
         catch(JSONException e)
         {
@@ -153,16 +153,16 @@ public class GameMessagingService extends Service implements MessagingUtils.NewG
 
         Intent broadcastMessageIntent = new Intent();
         broadcastMessageIntent.setAction(GameMessageReceiver.ACTION_HANDLE_ATTACK_RESPONSE_MESSAGE);
-        broadcastMessageIntent.putExtra("responseType", responseResult);
-        broadcastMessageIntent.putExtra("attackerMessage",messageToDisplay);
+        broadcastMessageIntent.putExtra(GameMessageReceiver.EXTRA_RESPONSE_TYPE, responseResult);
+        broadcastMessageIntent.putExtra(GameMessageReceiver.EXTRA_ATTACKER_MESSAGE,messageToDisplay);
         sendOrderedBroadcast(broadcastMessageIntent,null);
     }
 
     private void handleNewsMessage(MqttMessage newsMessage)
     {
         Intent broadcastMessageIntent = new Intent();
-        broadcastMessageIntent.setAction(MainActivity.ACTION_HANDLE_NEWS_MESSAGE);
-        broadcastMessageIntent.putExtra("news",new String(newsMessage.getPayload()));
+        broadcastMessageIntent.setAction(GameMessageReceiver.ACTION_HANDLE_NEWS_MESSAGE);
+        broadcastMessageIntent.putExtra(GameMessageReceiver.EXTRA_NEWS_JSON,new String(newsMessage.getPayload()));
         sendOrderedBroadcast(broadcastMessageIntent,null);
     }
 
@@ -172,7 +172,7 @@ public class GameMessagingService extends Service implements MessagingUtils.NewG
         try
         {
             JSONObject payloadObject = new JSONObject(new String(outgunnerMessage.getPayload()));
-            messageString = payloadObject.getString("message");
+            messageString = payloadObject.getString(GameMessageReceiver.EXTRA_MESSAGE);
         }
         catch(JSONException e)
         {
@@ -182,7 +182,7 @@ public class GameMessagingService extends Service implements MessagingUtils.NewG
         }
 
         Intent broadcastMessageIntent = new Intent();
-        broadcastMessageIntent.putExtra("message",messageString);
+        broadcastMessageIntent.putExtra(GameMessageReceiver.EXTRA_MESSAGE,messageString);
         broadcastMessageIntent.setAction(GameMessageReceiver.ACTION_HANDLE_OUTGUNNER_MESSAGE);
         sendOrderedBroadcast(broadcastMessageIntent,null);
     }

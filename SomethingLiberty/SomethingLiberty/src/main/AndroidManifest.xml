@@ -12,7 +12,7 @@
     <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-permission android:name="android.permission.VIBRATE" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
-    <uses-permission android:name="android.permission.GET_ACCOUNTS"/>
+    <uses-permission android:name="android.permission.GET_ACCOUNTS" />
 
     <application
         android:allowBackup="true"
@@ -38,13 +38,13 @@
             android:exported="false" />
 
         <receiver
-            android:name=".messaging.GameMessageReceiver"
+            android:name="com.something.liberty.messaging.GameMessageReceiver"
             android:enabled="true"
-            android:exported="false">
-            <intent-filter android:priority="5">
-                <action android:name="HANDLE_KILLED_MESSAGE"/>
-                <action android:name="HANDLE_ATTACK_RESPONSE_MESSAGE"/>
-                <action android:name="HANDLE_OUTGUNNER_MESSAGE"/>
+            android:exported="false" >
+            <intent-filter android:priority="5" >
+                <action android:name="HANDLE_KILLED_MESSAGE" />
+                <action android:name="HANDLE_ATTACK_RESPONSE_MESSAGE" />
+                <action android:name="HANDLE_OUTGUNNER_MESSAGE" />
             </intent-filter>
         </receiver>
     </application>

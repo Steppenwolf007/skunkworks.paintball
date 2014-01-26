@@ -8,19 +8,17 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.location.Location;
+import android.content.SharedPreferences;
 import android.os.SystemClock;
+import android.preference.PreferenceManager;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.webkit.JavascriptInterface;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
-import android.widget.Toast;
 
-import com.something.liberty.location.LocationUtils;
 import com.something.liberty.location.ReportLocationService;
 import com.something.liberty.messaging.GameMessageReceiver;
 import com.something.liberty.messaging.GameMessagingService;
@@ -33,9 +31,10 @@ import org.json.JSONObject;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-public class MainActivity extends ActionBarActivity {
+public class MainActivity extends ActionBarActivity
+{
+    private static final int LOCATION_POLL_INTERVAL = 30000;
 
-    public static final String ACTION_HANDLE_NEWS_MESSAGE = "HANDLE_NEWS_MESSAGE";
 
     private BroadcastReceiver gameMessageBroadcastReceiver = null;
     private IntentFilter gameMessageIntentFilter = null;
@@ -52,22 +51,28 @@ public class MainActivity extends ActionBarActivity {
         Intent intent = new Intent(this,GameMessagingService.class);
         startService(intent);
 
-        // test location polling
         AlarmManager alarmManager = (AlarmManager) getSystemService(Service.ALARM_SERVICE);
         PendingIntent pendingIntent = PendingIntent.getService(this,0,new Intent(this,ReportLocationService.class),0);
-        alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, SystemClock.elapsedRealtime() + 30000, 120000, pendingIntent);
+        //cancel existing alarm if one exists
+        alarmManager.cancel(pendingIntent);
 
-        //setup map web view
+        alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, SystemClock.elapsedRealtime() + LOCATION_POLL_INTERVAL, LOCATION_POLL_INTERVAL, pendingIntent);
+
+        setupMapWebView();
+
+        setupGameMessageReceiver();
+    }
+
+    private void setupMapWebView()
+    {
         WebView webView = (WebView) findViewById(R.id.webView);
         WebSettings webSettings = webView.getSettings();
         webSettings.setJavaScriptEnabled(true);
-        // webSettings.setAllowContentAccess(true);
         webSettings.setAllowFileAccess(true);
         webView.loadUrl("file:///android_asset/index.html");
         webView.addJavascriptInterface(this, "Android");
-
-        setupGameMessageReciever();
     }
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu)
@@ -82,22 +87,25 @@ public class MainActivity extends ActionBarActivity {
         switch(item.getItemId())
         {
             case R.id.action_attack:
-                LocationUtils locationUtils = new LocationUtils(this);
-                Location lastKnownLocation = locationUtils.getLastKnownLocation();
-                if(lastKnownLocation != null)
-                {
-                    SendMessage.sendAttackMessage(this,lastKnownLocation.getLongitude(),lastKnownLocation.getLatitude());
-                }
-                else
-                {
-                    Toast.makeText(this,getResources().getString(R.string.no_known_location),Toast.LENGTH_SHORT).show();
-                }
+                SendMessage.sendAttackMessage(this);
                 break;
-            case R.id.action_settings:
 
-            return true;
+            case R.id.menu_news:
+                SendMessage.sendNewsRequest(this);
+                break;
+
+            case R.id.menu_news_page:
+                Intent intent = new Intent(this,NewsActivity.class);
+                startActivity(intent);
+                break;
+            case R.id.menu_settings:
+                Intent settingsIntent = new Intent(this,SettingsActivity.class);
+                startActivity(settingsIntent);
+                break;
+
         }
-        return super.onOptionsItemSelected(item);
+        return true;
+    }
 
     private void removeAllEventsFromMap()
     {
@@ -105,38 +113,38 @@ public class MainActivity extends ActionBarActivity {
         webView.loadUrl("javascript:removeAllEvents()");
     }
 
-    private void addEventToMap(String message, double longitude, double latitude)
+    private void addEventToMap(String iconSrc, double longitude, double latitude)
     {
         WebView webView = (WebView) findViewById(R.id.webView);
-        webView.loadUrl("javascript:addEvent('" + message + "'," + longitude + "," + latitude + ")");
+        webView.loadUrl("javascript:addEvent('" + iconSrc + "'," + longitude + "," + latitude + ")");
     }
 
-    private void setupGameMessageReciever()
+    private void setupGameMessageReceiver()
     {
         gameMessageBroadcastReceiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
                 if(GameMessageReceiver.ACTION_HANDLE_KILLED_MESSAGE.equals(intent.getAction()))
                 {
-                    String title = "Killed";
-                    String message = intent.getStringExtra("message");
+                    String title = context.getString(R.string.splatted);
+                    String message = intent.getStringExtra(GameMessageReceiver.EXTRA_MESSAGE);
                     showMessageDialog(title,message);
                 }
                 else if(GameMessageReceiver.ACTION_HANDLE_ATTACK_RESPONSE_MESSAGE.equals(intent.getAction()))
                 {
-                    String title = intent.getStringExtra("responseType");
-                    String message = intent.getStringExtra("attackerMessage");
+                    String title = intent.getStringExtra(GameMessageReceiver.EXTRA_RESPONSE_TYPE);
+                    String message = intent.getStringExtra(GameMessageReceiver.EXTRA_ATTACKER_MESSAGE);
                     showMessageDialog(title,message);
                 }
-                else if(ACTION_HANDLE_NEWS_MESSAGE.equals(intent.getAction()))
+                else if(GameMessageReceiver.ACTION_HANDLE_NEWS_MESSAGE.equals(intent.getAction()))
                 {
-                    String news = intent.getStringExtra("news");
-                    displayNewsOnMap(news);
+                    String newsJson = intent.getStringExtra(GameMessageReceiver.EXTRA_NEWS_JSON);
+                    parseAndDisplayNews(newsJson);
                 }
                 else if(GameMessageReceiver.ACTION_HANDLE_OUTGUNNER_MESSAGE.equals(intent.getAction()))
                 {
-                    String message = intent.getStringExtra("message");
-                    showMessageDialog("Self Defence",message);
+                    String message = intent.getStringExtra(GameMessageReceiver.EXTRA_MESSAGE);
+                    showMessageDialog(context.getString(R.string.self_defence),message);
                 }
                 abortBroadcast();
             }
@@ -144,10 +152,11 @@ public class MainActivity extends ActionBarActivity {
         gameMessageIntentFilter = new IntentFilter();
         gameMessageIntentFilter.addAction(GameMessageReceiver.ACTION_HANDLE_ATTACK_RESPONSE_MESSAGE);
         gameMessageIntentFilter.addAction(GameMessageReceiver.ACTION_HANDLE_KILLED_MESSAGE);
-        gameMessageIntentFilter.addAction(ACTION_HANDLE_NEWS_MESSAGE);
+        gameMessageIntentFilter.addAction(GameMessageReceiver.ACTION_HANDLE_NEWS_MESSAGE);
         gameMessageIntentFilter.addAction(GameMessageReceiver.ACTION_HANDLE_OUTGUNNER_MESSAGE);
         gameMessageIntentFilter.setPriority(10);
     }
+
 
     private void showMessageDialog(String title,String message)
     {
@@ -157,9 +166,10 @@ public class MainActivity extends ActionBarActivity {
         builder.show();
     }
 
-    private void displayNewsOnMap(String news)
+    private void parseAndDisplayNews(String news)
     {
         removeAllEventsFromMap();
+        JSONArray newsSummaries = new JSONArray();
         try
         {
             JSONArray newsArray = new JSONArray(news);
@@ -172,7 +182,9 @@ public class MainActivity extends ActionBarActivity {
                 double latitude = location.getDouble("latitude");
 
                 String eventType = currentNewsItem.getString("type");
-                String attackerUsername = currentNewsItem.getString("attackerUsername");
+                JSONObject attackerIdentity = currentNewsItem.getJSONObject("attackerIdentity");
+                String attackerGeneratedName = attackerIdentity.getString("generatedName");
+                String eventColor = attackerIdentity.getString("colorAsHexString");
 
                 long timeMilis = currentNewsItem.getLong("timeOccurred");
                 Date date = new Date(timeMilis);
@@ -180,22 +192,27 @@ public class MainActivity extends ActionBarActivity {
                 SimpleDateFormat dateFormat = new SimpleDateFormat("hh:mm a");
                 String whatHappened = "";
                 
-                if(eventType.equals("PLAYER_OUTGUNNED"))
+                if(eventType.equals(MapIconUtils.NEWS_TYPE_OUTGUNNED))
                 {
-                    whatHappened = "Was Outgunned Here";
+                    whatHappened = "Was Outgunned";
                 }
-                else if(eventType.equals("PLAYER_MISS"))
+                else if(eventType.equals(MapIconUtils.NEWS_TYPE_MISS))
                 {
-                    whatHappened = "Missed Here";
+                    whatHappened = "Missed";
                 }
-                else if(eventType.equals("PLAYER_HIT"))
+                else if(eventType.equals(MapIconUtils.NEWS_TYPE_HIT))
                 {
-                    whatHappened = "Killed Here";
+                    whatHappened = "Splatted";
                 }
 
-                String message = attackerUsername + " " + whatHappened + " at " + dateFormat.format(date);
-                addEventToMap(message, longitude, latitude);
+                String message = whatHappened + ": " +attackerGeneratedName + "\n" + dateFormat.format(date);
+                newsSummaries.put(message);
+                String iconSrc = MapIconUtils.getIconSrc(eventType,eventColor);
+                addEventToMap(iconSrc, longitude, latitude);
             }
+            SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(this);
+            sharedPrefs.edit().putString(NewsActivity.SHARED_PREF_NEWS,newsSummaries.toString()).commit();
+            Log.d("SomethingLiberty",newsSummaries.toString());
         }
         catch(JSONException e)
         {
@@ -224,19 +241,4 @@ public class MainActivity extends ActionBarActivity {
         registerReceiver(gameMessageBroadcastReceiver,gameMessageIntentFilter);
         SendMessage.sendNewsRequest(this);
     }
-
-    AlertDialog currentlyDisplayedEvent = null;
-    @JavascriptInterface
-    public void showEventDialog(String message)
-    {
-
-        if(currentlyDisplayedEvent == null || !currentlyDisplayedEvent.isShowing())
-        {
-            AlertDialog.Builder builder = new AlertDialog.Builder(this);
-            builder.setTitle("Event");
-            builder.setMessage(message);
-            currentlyDisplayedEvent = builder.show();
-        }
-    }
-
 }

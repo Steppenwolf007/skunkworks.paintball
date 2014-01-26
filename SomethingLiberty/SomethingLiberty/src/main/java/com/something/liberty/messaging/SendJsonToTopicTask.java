@@ -1,16 +1,20 @@
 package com.something.liberty.messaging;
 
+import android.content.Context;
 import android.os.AsyncTask;
 import android.util.Log;
+
+import com.something.liberty.UserUtils;
 
 import org.json.JSONObject;
 
 class SendJsonToTopicTask extends AsyncTask<JSONObject,Void,Void> {
 
     private String mTopic = null;
-
-    public SendJsonToTopicTask(String topic)
+    private Context mContext = null;
+    public SendJsonToTopicTask(Context context,String topic)
     {
+        mContext = context;
         mTopic = topic;
     }
 
@@ -25,7 +29,7 @@ class SendJsonToTopicTask extends AsyncTask<JSONObject,Void,Void> {
         }
         String jsonString = jsonMessage.toString();
         Log.d("SomethingLiberty","jsonString = " + jsonString);
-        MessagingUtils messagingUtils = MessagingUtils.getMessagingUtils();
+        MessagingUtils messagingUtils = MessagingUtils.getMessagingUtils(UserUtils.getUsername(mContext));
         messagingUtils.sendMessage(mTopic, jsonString);
         return null;
     }

@@ -29,25 +29,26 @@ makeLonLat = function(longitude,latitude)
 	return lonlat;
 }
 
-placeMarker = function(message,lonLat)
+displayEvent = function(message)
+{
+}
+
+placeMarker = function(imgSrc,lonLat)
 {
 	var size = new OpenLayers.Size(21,25);
 	var offset = new OpenLayers.Pixel(-(size.w/2), -size.h);
-	var icon = new OpenLayers.Icon('marker.png', size, offset);
+	var icon = new OpenLayers.Icon(imgSrc, size, offset);
 	var marker = new OpenLayers.Marker(lonLat,icon);
 
 	markerLayer.addMarker(marker);
-
-    markerLayer.events.register('touchend',marker,function()
-    {
-        Android.showEventDialog(message);
-    });
 }
 
-addEvent = function(message,longitude,latitude)
+
+
+addEvent = function(imgSrc,longitude,latitude)
 {
 	var lonlat = makeLonLat(longitude,latitude);
-	placeMarker(message,lonlat);
+	placeMarker(imgSrc,lonlat);
 }
 
 removeAllEvents = function()
