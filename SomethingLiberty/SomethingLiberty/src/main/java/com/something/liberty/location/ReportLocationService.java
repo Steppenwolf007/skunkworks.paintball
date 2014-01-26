@@ -39,26 +39,31 @@ public class ReportLocationService extends Service
     {
         Log.i("SomethingLiberty", "Requesting location update from device");
         LocationManager locationManager = (LocationManager) getSystemService(Service.LOCATION_SERVICE);
-        locationManager.requestSingleUpdate(LocationManager.GPS_PROVIDER,new LocationListener() {
+        locationManager.requestSingleUpdate(LocationManager.GPS_PROVIDER,new LocationListener()
+        {
             @Override
-            public void onLocationChanged(Location location) {
+            public void onLocationChanged(Location location)
+            {
                 Log.i("SomethingLiberty","Received location update from device");
 
-                SendMessage.sendLocationUpdate(getApplicationContext(),location.getLongitude(),location.getLatitude());
+                SendMessage.sendLocationUpdate(getApplicationContext(), location.getLongitude(), location.getLatitude());
             }
 
             @Override
-            public void onStatusChanged(String provider, int status, Bundle extras) {
-
-            }
-
-            @Override
-            public void onProviderEnabled(String provider) {
+            public void onStatusChanged(String provider, int status, Bundle extras)
+            {
 
             }
 
             @Override
-            public void onProviderDisabled(String provider) {
+            public void onProviderEnabled(String provider)
+            {
+
+            }
+
+            @Override
+            public void onProviderDisabled(String provider)
+            {
 
             }
         },null);
