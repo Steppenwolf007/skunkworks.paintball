@@ -23,8 +23,7 @@ public class SendMessage
      */
     public static void sendAttackMessage(Context context)
     {
-        LocationUtils locationUtils = new LocationUtils(context);
-        Location lastKnownLocation = locationUtils.getLastKnownLocation();
+        Location lastKnownLocation = LocationUtils.getLastKnownLocation(context);
         if(lastKnownLocation != null)
         {
             JSONObject locationUpdate = null;

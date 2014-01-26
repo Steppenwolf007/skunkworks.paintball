@@ -5,18 +5,12 @@ import android.content.Context;
 import android.location.Location;
 import android.location.LocationManager;
 
-public class LocationUtils
+public abstract class LocationUtils
 {
-    private Context mContext = null;
 
-    public LocationUtils(Context context)
+    public static Location getLastKnownLocation(Context context)
     {
-        this.mContext = context;
-    }
-
-    public Location getLastKnownLocation()
-    {
-        LocationManager locationManager = (LocationManager) mContext.getSystemService(Service.LOCATION_SERVICE);
+        LocationManager locationManager = (LocationManager) context.getSystemService(Service.LOCATION_SERVICE);
         return locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
     }
 }
