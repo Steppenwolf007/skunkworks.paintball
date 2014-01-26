@@ -1,6 +1,8 @@
 package com.something.liberty.messaging;
 
+import android.app.ActivityManager;
 import android.app.Service;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Handler;
@@ -9,22 +11,28 @@ import android.os.PowerManager;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.getpebble.android.kit.PebbleKit;
+import com.getpebble.android.kit.util.PebbleDictionary;
 import com.something.liberty.UserUtils;
 
 import org.eclipse.paho.client.mqttv3.MqttMessage;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-/**
- * @author Alexander Pringle
- */
+import java.util.UUID;
+
+
 public class GameMessagingService extends Service implements MessagingUtils.NewGameMessageHandler, MessagingUtils.ConnectionLostHandler
 {
+    public static UUID PEBBLE_APP_UUID = UUID.fromString("8e994e98-0427-4a18-8103-f6b7e5489782");
+    private static final int PEBBLE_KEY_ATTACK = 1;
+    private static final String PEBBLE_MESSAGE_TYPE_ATTACK = "ATTACK";
 
     private static final String MQTT_TOPIC_SPLATTED = "something/killed/";
     private static final String MQTT_TOPIC_ATTACK_RESPONSE = "something/attResponse/";
     private static final String MQTT_TOPIC_NEWS = "something/news/";
     private static final String MQTT_TOPIC_OUTGUNNER = "something/outgunner/";
+
 
     public static void ensureServiceStarted(Context context)
     {
@@ -50,7 +58,7 @@ public class GameMessagingService extends Service implements MessagingUtils.NewG
 
     private Handler uiThreadHandler = null;
     private PowerManager.WakeLock wakeLock = null;
-
+    private BroadcastReceiver pebbleKitReceiver = null;
     @Override
     public void onCreate()
     {
@@ -66,6 +74,19 @@ public class GameMessagingService extends Service implements MessagingUtils.NewG
     {
         Log.i("SomethingLiberty","GameMessagingService Started");
         uiThreadHandler = new Handler();
+        pebbleKitReceiver = PebbleKit.registerReceivedDataHandler(this, new PebbleKit.PebbleDataReceiver(PEBBLE_APP_UUID)
+        {
+            @Override
+            public void receiveData(Context context, int transactionId, PebbleDictionary data)
+            {
+                String messageType = data.getString(PEBBLE_KEY_ATTACK);
+                if(PEBBLE_MESSAGE_TYPE_ATTACK.equals(messageType))
+                {
+                    SendMessage.sendAttackMessage(context);
+                    PebbleKit.sendAckToPebble(context,transactionId);
+                }
+            }
+        });
 
         final MessagingUtils.ConnectionLostHandler thisConnectionLostHandler = this;
         final MessagingUtils.NewGameMessageHandler thisMessageHandler = this;
@@ -181,15 +202,15 @@ public class GameMessagingService extends Service implements MessagingUtils.NewG
         broadcastMessageIntent.setAction(GameMessageReceiver.ACTION_HANDLE_ATTACK_RESPONSE_MESSAGE);
         broadcastMessageIntent.putExtra(GameMessageReceiver.EXTRA_RESPONSE_TYPE, responseResult);
         broadcastMessageIntent.putExtra(GameMessageReceiver.EXTRA_ATTACKER_MESSAGE,messageToDisplay);
-        sendOrderedBroadcast(broadcastMessageIntent,null);
+        sendOrderedBroadcast(broadcastMessageIntent, null);
     }
 
     private void handleNewsMessage(MqttMessage newsMessage)
     {
         Intent broadcastMessageIntent = new Intent();
         broadcastMessageIntent.setAction(GameMessageReceiver.ACTION_HANDLE_NEWS_MESSAGE);
-        broadcastMessageIntent.putExtra(GameMessageReceiver.EXTRA_NEWS_JSON,new String(newsMessage.getPayload()));
-        sendOrderedBroadcast(broadcastMessageIntent,null);
+        broadcastMessageIntent.putExtra(GameMessageReceiver.EXTRA_NEWS_JSON, new String(newsMessage.getPayload()));
+        sendOrderedBroadcast(broadcastMessageIntent, null);
     }
 
     private void handleOutgunnerMessage(MqttMessage outgunnerMessage)
@@ -216,6 +237,10 @@ public class GameMessagingService extends Service implements MessagingUtils.NewG
     @Override
     public void onDestroy() {
         super.onDestroy();
+        if(pebbleKitReceiver != null)
+        {
+            unregisterReceiver(pebbleKitReceiver);
+        }
         wakeLock.release();
     }
 }

@@ -3,11 +3,18 @@ package com.something.liberty.alerts;
 import android.app.NotificationManager;
 import android.app.Service;
 import android.content.Context;
+import android.content.Intent;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.support.v4.app.NotificationCompat;
 
 import com.something.liberty.R;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author Alexander Pringle
@@ -36,6 +43,17 @@ public class NotificationUtils
         builder.setVibrate(new long[]{100,100,100,100});
 
         notificationManager.notify(contentString.hashCode(),builder.build());
+
+        Intent pebbleIntent = new Intent("com.getpebble.action.SEND_NOTIFICATION");
+        Map data = new HashMap();
+        data.put("title",titleString);
+        data.put("body",contentString);
+        JSONObject jsonData = new JSONObject(data);
+        String dataString = new JSONArray().put(jsonData).toString();
+        pebbleIntent.putExtra("messageType","PEBBLE_ALERT");
+        pebbleIntent.putExtra("sender","PebbleActivity");
+        pebbleIntent.putExtra("notificationData",dataString);
+        mContext.sendBroadcast(pebbleIntent);
     }
 
 }
