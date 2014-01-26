@@ -230,7 +230,7 @@ public class MainActivity extends ActionBarActivity
                 
                 if(eventType.equals(MapIconUtils.NEWS_TYPE_OUTGUNNED))
                 {
-                    whatHappened = "Was Outgunned";
+                    whatHappened = "Outgunned";
                 }
                 else if(eventType.equals(MapIconUtils.NEWS_TYPE_MISS))
                 {
@@ -247,7 +247,7 @@ public class MainActivity extends ActionBarActivity
                 addEventToMap(iconSrc, longitude, latitude);
             }
             SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(this);
-            sharedPrefs.edit().putString(NewsActivity.SHARED_PREF_NEWS,newsSummaries.toString()).commit();
+            sharedPrefs.edit().putString(getString(R.string.pref_news_store),newsSummaries.toString()).commit();
             Log.d("SomethingLiberty",newsSummaries.toString());
         }
         catch(JSONException e)

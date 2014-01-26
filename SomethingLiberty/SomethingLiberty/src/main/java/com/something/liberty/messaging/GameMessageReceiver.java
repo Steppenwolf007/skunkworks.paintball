@@ -3,7 +3,6 @@ package com.something.liberty.messaging;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.util.Log;
 
 import com.something.liberty.R;
 import com.something.liberty.alerts.NotificationUtils;

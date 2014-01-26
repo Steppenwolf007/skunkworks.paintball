@@ -47,6 +47,11 @@
                 <action android:name="HANDLE_OUTGUNNER_MESSAGE" />
             </intent-filter>
         </receiver>
+
+        <activity
+            android:name="com.something.liberty.NewsActivity"
+            android:label="@string/title_activity_news" >
+        </activity>
         <activity
             android:name="com.something.liberty.SettingsActivity"
             android:label="Settings" >
