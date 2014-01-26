@@ -8,6 +8,10 @@
         android:icon="@drawable/ic_launcher"
         app:showAsAction="always"/>
 
+    <item android:id="@+id/menu_news"
+        android:title="Request News"
+        android:orderInCategory="100"
+        app:showAsAction="never" />
 
     <item android:id="@+id/menu_news_page"
         android:title="@string/action_latest_news"
