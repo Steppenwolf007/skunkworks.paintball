@@ -8,6 +8,9 @@ import com.something.liberty.UserUtils;
 
 import org.json.JSONObject;
 
+/**
+ * @author Alexander Pringle
+ */
 class SendJsonToTopicTask extends AsyncTask<JSONObject,Void,Void> {
 
     private String mTopic = null;

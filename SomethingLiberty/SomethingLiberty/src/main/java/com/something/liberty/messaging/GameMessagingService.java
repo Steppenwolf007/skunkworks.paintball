@@ -15,6 +15,9 @@ import org.eclipse.paho.client.mqttv3.MqttMessage;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+/**
+ * @author Alexander Pringle
+ */
 public class GameMessagingService extends Service implements MessagingUtils.NewGameMessageHandler, MessagingUtils.ConnectionLostHandler
 {
 

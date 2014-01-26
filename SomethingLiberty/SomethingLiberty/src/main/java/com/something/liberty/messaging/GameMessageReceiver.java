@@ -7,6 +7,9 @@ import android.content.Intent;
 import com.something.liberty.R;
 import com.something.liberty.alerts.NotificationUtils;
 
+/**
+ * @author Alexander Pringle
+ */
 public class GameMessageReceiver extends BroadcastReceiver {
 
     public static final String EXTRA_MESSAGE = "message";

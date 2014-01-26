@@ -7,6 +7,9 @@ import android.preference.PreferenceManager;
 
 import com.something.liberty.messaging.GameMessagingService;
 
+/**
+ * @author Alexander Pringle
+ */
 public class SettingsActivity extends PreferenceActivity
 {
     SharedPreferences.OnSharedPreferenceChangeListener twitterUsernameChangeListener = null;

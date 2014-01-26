@@ -10,6 +10,9 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.util.Log;
 
+/**
+ * @author Alexander Pringle
+ */
 public class UserUtils
 {
     public static final String DEFAULT_USERNAME = "username";

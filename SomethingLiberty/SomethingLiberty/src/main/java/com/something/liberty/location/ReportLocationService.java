@@ -11,6 +11,9 @@ import android.util.Log;
 
 import com.something.liberty.messaging.SendMessage;
 
+/**
+ * @author Alexander Pringle
+ */
 public class ReportLocationService extends Service
 {
 

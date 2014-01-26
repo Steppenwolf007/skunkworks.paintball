@@ -5,6 +5,9 @@ import android.content.Context;
 import android.location.Location;
 import android.location.LocationManager;
 
+/**
+ * @author Alexander Pringle
+ */
 public abstract class LocationUtils
 {
 

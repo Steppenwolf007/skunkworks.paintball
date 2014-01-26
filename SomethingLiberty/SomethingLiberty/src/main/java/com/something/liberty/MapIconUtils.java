@@ -2,6 +2,9 @@ package com.something.liberty;
 
 import java.util.HashMap;
 
+/**
+ * @author Alexander Pringle
+ */
 public abstract class MapIconUtils
 {
     private static final String OUTGUNNED_ICON_SRC = "outgunned.png";

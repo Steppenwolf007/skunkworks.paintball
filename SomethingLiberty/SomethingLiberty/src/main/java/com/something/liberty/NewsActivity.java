@@ -26,6 +26,9 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * @author Alexander Pringle
+ */
 public class NewsActivity extends ActionBarActivity {
 
     @Override
@@ -72,6 +75,9 @@ public class NewsActivity extends ActionBarActivity {
     }
 }
 
+/**
+ * @author Alexander Pringle
+ */
 class NewsListAdapter extends ArrayAdapter<String>
 {
     private List<String> mNewsItems = null;

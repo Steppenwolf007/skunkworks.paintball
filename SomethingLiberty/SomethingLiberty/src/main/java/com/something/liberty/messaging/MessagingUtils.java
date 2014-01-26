@@ -12,6 +12,9 @@ import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * @author Alexander Pringle
+ */
 class MessagingUtils implements MqttCallback
 {
     private static final String MQTT_BROKER_URL = BrokerDetails.MQTT_BROKER_URL;

@@ -9,6 +9,9 @@ import android.support.v4.app.NotificationCompat;
 
 import com.something.liberty.R;
 
+/**
+ * @author Alexander Pringle
+ */
 public class NotificationUtils
 {
     private Context mContext = null;

@@ -12,6 +12,9 @@ import com.something.liberty.location.LocationUtils;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+/**
+ * @author Alexander Pringle
+ */
 public class SendMessage
 {
     private static final String MQTT_TOPIC_REQUEST_NEWS = "something/requestNews";

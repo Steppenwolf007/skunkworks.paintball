@@ -34,6 +34,9 @@ import org.json.JSONObject;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+/**
+ * @author Alexander Pringle
+ */
 public class MainActivity extends ActionBarActivity
 {
     private static final int LOCATION_POLL_INTERVAL = 30000;
@@ -61,6 +64,7 @@ public class MainActivity extends ActionBarActivity
 
         AlarmManager alarmManager = (AlarmManager) getSystemService(Service.ALARM_SERVICE);
         PendingIntent pendingIntent = PendingIntent.getService(this,0,new Intent(this,ReportLocationService.class),0);
+
         //cancel existing alarm if one exists
         alarmManager.cancel(pendingIntent);
 
