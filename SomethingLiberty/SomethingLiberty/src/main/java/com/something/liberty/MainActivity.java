@@ -160,7 +160,7 @@ public class MainActivity extends ActionBarActivity
         gameMessageBroadcastReceiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
-                if(GameMessageReceiver.ACTION_HANDLE_KILLED_MESSAGE.equals(intent.getAction()))
+                if(GameMessageReceiver.ACTION_HANDLE_SPLATTED_MESSAGE.equals(intent.getAction()))
                 {
                     String title = context.getString(R.string.splatted);
                     String message = intent.getStringExtra(GameMessageReceiver.EXTRA_MESSAGE);
@@ -187,7 +187,7 @@ public class MainActivity extends ActionBarActivity
         };
         gameMessageIntentFilter = new IntentFilter();
         gameMessageIntentFilter.addAction(GameMessageReceiver.ACTION_HANDLE_ATTACK_RESPONSE_MESSAGE);
-        gameMessageIntentFilter.addAction(GameMessageReceiver.ACTION_HANDLE_KILLED_MESSAGE);
+        gameMessageIntentFilter.addAction(GameMessageReceiver.ACTION_HANDLE_SPLATTED_MESSAGE);
         gameMessageIntentFilter.addAction(GameMessageReceiver.ACTION_HANDLE_NEWS_MESSAGE);
         gameMessageIntentFilter.addAction(GameMessageReceiver.ACTION_HANDLE_OUTGUNNER_MESSAGE);
         gameMessageIntentFilter.setPriority(10);

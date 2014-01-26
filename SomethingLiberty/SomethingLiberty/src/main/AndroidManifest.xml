@@ -42,7 +42,7 @@
             android:enabled="true"
             android:exported="false" >
             <intent-filter android:priority="5" >
-                <action android:name="HANDLE_KILLED_MESSAGE" />
+                <action android:name="HANDLE_SPLATTED_MESSAGE" />
                 <action android:name="HANDLE_ATTACK_RESPONSE_MESSAGE" />
                 <action android:name="HANDLE_OUTGUNNER_MESSAGE" />
             </intent-filter>

@@ -17,7 +17,8 @@ import org.json.JSONObject;
 
 public class GameMessagingService extends Service implements MessagingUtils.NewGameMessageHandler, MessagingUtils.ConnectionLostHandler
 {
-    private static final String MQTT_TOPIC_KILLED = "something/killed/";
+
+    private static final String MQTT_TOPIC_SPLATTED = "something/killed/";
     private static final String MQTT_TOPIC_ATTACK_RESPONSE = "something/attResponse/";
     private static final String MQTT_TOPIC_NEWS = "something/news/";
     private static final String MQTT_TOPIC_OUTGUNNER = "something/outgunner/";
@@ -71,7 +72,7 @@ public class GameMessagingService extends Service implements MessagingUtils.NewG
             public void run() {
 
                 MessagingUtils messagingUtils = MessagingUtils.getMessagingUtils(UserUtils.getUsername(GameMessagingService.this));
-                messagingUtils.subscribeToTopic(MQTT_TOPIC_KILLED + username,thisMessageHandler);
+                messagingUtils.subscribeToTopic(MQTT_TOPIC_SPLATTED + username,thisMessageHandler);
                 messagingUtils.subscribeToTopic(MQTT_TOPIC_ATTACK_RESPONSE + username,thisMessageHandler);
                 messagingUtils.subscribeToTopic(MQTT_TOPIC_NEWS + username, thisMessageHandler);
                 messagingUtils.subscribeToTopic(MQTT_TOPIC_OUTGUNNER + username,thisMessageHandler);
@@ -98,9 +99,9 @@ public class GameMessagingService extends Service implements MessagingUtils.NewG
                 String messageString = new String(message.getPayload());
                 Log.i("SomethingLiberty", "GameMessagingService : received : " + messageString);
 
-                if(topic.contains(MQTT_TOPIC_KILLED))
+                if(topic.contains(MQTT_TOPIC_SPLATTED))
                 {
-                    handleKilledMessage(message);
+                    handleSplattedMessage(message);
                 }
                 else if(topic.contains(MQTT_TOPIC_ATTACK_RESPONSE))
                 {
@@ -131,9 +132,9 @@ public class GameMessagingService extends Service implements MessagingUtils.NewG
         });
     }
 
-    private void handleKilledMessage(MqttMessage killedMessage)
+    private void handleSplattedMessage(MqttMessage splattedMessage)
     {
-        String payloadString = new String(killedMessage.getPayload());
+        String payloadString = new String(splattedMessage.getPayload());
         String messageToDisplay = null;
         try
         {
@@ -144,12 +145,12 @@ public class GameMessagingService extends Service implements MessagingUtils.NewG
         catch(JSONException e)
         {
             e.printStackTrace();
-            Log.e("SomethingLiberty","Failed to parse killed message");
+            Log.e("SomethingLiberty","Failed to parse splatted message");
             return;
         }
 
         Intent broadcastMessageIntent = new Intent();
-        broadcastMessageIntent.setAction(GameMessageReceiver.ACTION_HANDLE_KILLED_MESSAGE);
+        broadcastMessageIntent.setAction(GameMessageReceiver.ACTION_HANDLE_SPLATTED_MESSAGE);
         broadcastMessageIntent.putExtra(GameMessageReceiver.EXTRA_MESSAGE,messageToDisplay);
         sendOrderedBroadcast(broadcastMessageIntent, null);
     }
