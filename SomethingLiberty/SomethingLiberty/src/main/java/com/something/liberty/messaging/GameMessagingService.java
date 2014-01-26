@@ -1,6 +1,7 @@
 package com.something.liberty.messaging;
 
 import android.app.Service;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Handler;
 import android.os.IBinder;
@@ -8,7 +9,6 @@ import android.os.PowerManager;
 import android.util.Log;
 import android.widget.Toast;
 
-import com.something.liberty.MainActivity;
 import com.something.liberty.UserUtils;
 
 import org.eclipse.paho.client.mqttv3.MqttMessage;
@@ -21,6 +21,28 @@ public class GameMessagingService extends Service implements MessagingUtils.NewG
     private static final String MQTT_TOPIC_ATTACK_RESPONSE = "something/attResponse/";
     private static final String MQTT_TOPIC_NEWS = "something/news/";
     private static final String MQTT_TOPIC_OUTGUNNER = "something/outgunner/";
+
+    public static void ensureServiceStarted(Context context)
+    {
+        // check if service already running
+        ActivityManager manager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
+        for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE))
+        {
+            if (GameMessagingService.class.getName().equals(service.service.getClassName()))
+            {
+                return;
+            }
+        }
+
+        Intent intent = new Intent(context,GameMessagingService.class);
+        context.startService(intent);
+    }
+
+    public static void stopService(Context context)
+    {
+        Intent intent = new Intent(context,GameMessagingService.class);
+        context.stopService(intent);
+    }
 
     private Handler uiThreadHandler = null;
     private PowerManager.WakeLock wakeLock = null;
@@ -38,7 +60,7 @@ public class GameMessagingService extends Service implements MessagingUtils.NewG
     @Override
     public int onStartCommand(Intent intent, int flags, int startId)
     {
-        Toast.makeText(getApplicationContext(),"Service started",Toast.LENGTH_SHORT).show();
+        Log.i("SomethingLiberty","GameMessagingService Started");
         uiThreadHandler = new Handler();
 
         final MessagingUtils.ConnectionLostHandler thisConnectionLostHandler = this;

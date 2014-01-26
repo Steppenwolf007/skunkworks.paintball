@@ -6,6 +6,7 @@ import android.app.PendingIntent;
 import android.app.Service;
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
@@ -18,6 +19,8 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
+import android.widget.EditText;
+import android.widget.LinearLayout;
 
 import com.something.liberty.location.ReportLocationService;
 import com.something.liberty.messaging.GameMessageReceiver;
@@ -35,7 +38,6 @@ public class MainActivity extends ActionBarActivity
 {
     private static final int LOCATION_POLL_INTERVAL = 30000;
 
-
     private BroadcastReceiver gameMessageBroadcastReceiver = null;
     private IntentFilter gameMessageIntentFilter = null;
 
@@ -47,9 +49,15 @@ public class MainActivity extends ActionBarActivity
 
         UserUtils.updateUsernameIfUnset(this);
 
-        // start messaging service
-        Intent intent = new Intent(this,GameMessagingService.class);
-        startService(intent);
+        if(!UserUtils.getUsername(this).equals(UserUtils.DEFAULT_USERNAME))
+        {
+            GameMessagingService.ensureServiceStarted(this);
+        }
+        else
+        {
+            showTwitterDialog();
+        }
+
 
         AlarmManager alarmManager = (AlarmManager) getSystemService(Service.ALARM_SERVICE);
         PendingIntent pendingIntent = PendingIntent.getService(this,0,new Intent(this,ReportLocationService.class),0);
@@ -63,6 +71,35 @@ public class MainActivity extends ActionBarActivity
         setupGameMessageReceiver();
     }
 
+    private void showTwitterDialog() {
+        AlertDialog.Builder dialogBuilder  = new AlertDialog.Builder(this);
+
+        dialogBuilder.setTitle(R.string.twitter_username);
+
+        final EditText usernameEditText = new EditText(this);
+        LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,LinearLayout.LayoutParams.MATCH_PARENT);
+        usernameEditText.setLayoutParams(layoutParams);
+
+        dialogBuilder.setView(usernameEditText);
+
+        dialogBuilder.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener()
+        {
+            @Override
+            public void onClick(DialogInterface dialog, int which)
+            {
+                UserUtils.setUsername(getApplicationContext(),usernameEditText.getText().toString());
+                if(!UserUtils.getUsername(getApplicationContext()).equals(UserUtils.DEFAULT_USERNAME))
+                {
+                    GameMessagingService.stopService(getApplicationContext());
+                    GameMessagingService.ensureServiceStarted(getApplicationContext());
+                }
+            }
+        });
+
+        dialogBuilder.show();
+    }
+
     private void setupMapWebView()
     {
         WebView webView = (WebView) findViewById(R.id.webView);
@@ -72,7 +109,6 @@ public class MainActivity extends ActionBarActivity
         webView.loadUrl("file:///android_asset/index.html");
         webView.addJavascriptInterface(this, "Android");
     }
-
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu)
@@ -220,6 +256,8 @@ public class MainActivity extends ActionBarActivity
             Log.e("SomethingLiberty","Failed to parse news");
         }
     }
+
+
 
     @Override
     protected void onStop()

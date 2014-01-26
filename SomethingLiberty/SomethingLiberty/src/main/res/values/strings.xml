@@ -8,4 +8,8 @@
     <string name="title_activity_news">Latest News</string>
     <string name="splatted">Splatted</string>
     <string name="self_defence">Self Defence</string>
+    <string name="enter_twitter_username">Update twitter username</string>
+    <string name="twitter_username">Twitter Username</string>
+
+    <string name="pref_twitter_username">PREF_TWITTER_USERNAME</string>
 </resources>

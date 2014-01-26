@@ -12,19 +12,18 @@ import android.util.Log;
 
 public class UserUtils
 {
-    private static final String PREFS_USERNAME = "USERNAME";
-    private static final String DEFAULT_USERNAME = "username";
+    public static final String DEFAULT_USERNAME = "username";
 
     public static String getUsername(Context context)
     {
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
-        return sharedPreferences.getString(PREFS_USERNAME,DEFAULT_USERNAME);
+        return sharedPreferences.getString(context.getString(R.string.pref_twitter_username),DEFAULT_USERNAME);
     }
 
-    private static void setUsername(Context context,String username)
+    public static void setUsername(Context context,String username)
     {
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
-        sharedPreferences.edit().putString(PREFS_USERNAME,username).commit();
+        sharedPreferences.edit().putString(context.getString(R.string.pref_twitter_username),username).commit();
     }
 
     private static String readTwitterUsername(Context context)
