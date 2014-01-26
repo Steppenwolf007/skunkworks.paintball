@@ -33,6 +33,8 @@ import org.json.JSONObject;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Timer;
+import java.util.TimerTask;
 
 /**
  * @author Alexander Pringle
@@ -43,6 +45,8 @@ public class MainActivity extends ActionBarActivity
 
     private BroadcastReceiver gameMessageBroadcastReceiver = null;
     private IntentFilter gameMessageIntentFilter = null;
+
+    private Timer newsRequestTimer = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -55,24 +59,23 @@ public class MainActivity extends ActionBarActivity
         if(!UserUtils.getUsername(this).equals(UserUtils.DEFAULT_USERNAME))
         {
             GameMessagingService.ensureServiceStarted(this);
+            setupLocationPolling();
         }
         else
         {
             showTwitterDialog();
         }
 
+        setupMapWebView();
+        setupGameMessageReceiver();
+    }
 
+    private void setupLocationPolling() {
         AlarmManager alarmManager = (AlarmManager) getSystemService(Service.ALARM_SERVICE);
         PendingIntent pendingIntent = PendingIntent.getService(this,0,new Intent(this,ReportLocationService.class),0);
-
         //cancel existing alarm if one exists
         alarmManager.cancel(pendingIntent);
-
         alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, SystemClock.elapsedRealtime() + LOCATION_POLL_INTERVAL, LOCATION_POLL_INTERVAL, pendingIntent);
-
-        setupMapWebView();
-
-        setupGameMessageReceiver();
     }
 
     private void showTwitterDialog() {
@@ -112,6 +115,20 @@ public class MainActivity extends ActionBarActivity
         webSettings.setAllowFileAccess(true);
         webView.loadUrl("file:///android_asset/index.html");
         webView.addJavascriptInterface(this, "Android");
+    }
+
+    private TimerTask getRequestNewsTimerTask()
+    {
+        TimerTask requestNewsTimerTask =  new TimerTask()
+        {
+            @Override
+            public void run()
+            {
+                SendMessage.sendNewsRequest(getApplicationContext());
+            }
+        };
+
+        return requestNewsTimerTask;
     }
 
     @Override
@@ -274,13 +291,19 @@ public class MainActivity extends ActionBarActivity
     {
         super.onPause();
         unregisterReceiver(gameMessageBroadcastReceiver);
+        if(newsRequestTimer != null)
+        {
+            newsRequestTimer.cancel();
+        }
     }
 
     @Override
     protected void onResume()
     {
         super.onResume();
-        registerReceiver(gameMessageBroadcastReceiver,gameMessageIntentFilter);
+        registerReceiver(gameMessageBroadcastReceiver, gameMessageIntentFilter);
         SendMessage.sendNewsRequest(this);
+        newsRequestTimer = new Timer();
+        newsRequestTimer.schedule(getRequestNewsTimerTask(),new Date(),20000);
     }
 }
