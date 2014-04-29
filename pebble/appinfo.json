@@ -1,0 +1,23 @@
+{
+  "uuid": "8e994e98-0427-4a18-8103-f6b7e5489782",
+  "shortName": "Liberty Paintball",
+  "longName": "Liberty Paintball",
+  "companyName": "Something Something Liberty",
+  "versionCode": 1,
+  "versionLabel": "1.0.0",
+  "watchapp": {
+    "watchface": false
+  },
+  "appKeys": {
+    "dummy": 0
+  },
+  "resources": {
+    "media": [
+    {
+      "type" : "png",
+      "name" : "IMAGE_PAINTBALL",
+      "file" : "images/purplepaintball.png"
+    }
+    ]
+  }
+}
