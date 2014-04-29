@@ -1,0 +1,11 @@
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <EditTextPreference
+        android:key="@string/pref_twitter_username"
+        android:defaultValue="Username"
+        android:selectAllOnFocus="true"
+        android:inputType="textCapWords"
+        android:title="Twitter Username"
+        android:text="Change Username"
+        android:singleLine="true"
+        android:maxLines="1" />
+</PreferenceScreen>

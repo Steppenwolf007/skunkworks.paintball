@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Liberty Paintball</string>
+    <string name="action_settings">Settings</string>
+    <string name="notification_ticker">News Flash</string>
+    <string name="action_attack">Attack</string>
+    <string name="no_known_location">No Known Location</string>
+    <string name="title_activity_news">Latest News</string>
+    <string name="action_latest_news">Latest News</string>
+    <string name="splatted">Splatted</string>
+    <string name="self_defence">Self Defence</string>
+    <string name="enter_twitter_username">Update twitter username</string>
+    <string name="twitter_username">Twitter Username</string>
+
+    <string name="pref_twitter_username">PREF_TWITTER_USERNAME</string>
+    <string name="pref_news_store">PREF_NEWS_STORE</string>
+</resources>
