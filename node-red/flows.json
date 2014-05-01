@@ -1,0 +1,1248 @@
+[
+  {
+    "type":"tab",
+    "id":"1f4d7662.4c1422",
+    "label":"Attacking"
+  },
+  {
+    "type":"tab",
+    "id":"550ac689.88e1a8",
+    "label":"Location Update"
+  },
+  {
+    "type":"tab",
+    "id":"347b9e93.569f32",
+    "label":"Newsfeed"
+  },
+  {
+    "type":"tab",
+    "id":"439bb71e.ef977",
+    "label":"Joining and Leaving"
+  },
+  {
+    "type":"tab",
+    "id":"91a87dc4.866cd",
+    "label":"Intel"
+  },
+  {
+    "type":"tab",
+    "id":"bac47413.be7f",
+    "label":"Identity"
+  },
+  {
+    "id":"6efc6b8.e8fa194",
+    "type":"mqtt-broker",
+    "broker":"127.0.0.1",
+    "port":"1883"
+  },
+  {
+    "id":"e248c633.8c0bf",
+    "type":"twitter-credentials",
+    "screen_name":"@SSomethingL"
+  },
+  {
+    "id":"bcbd98ba.c9afa",
+    "type":"comment",
+    "name":"Listen for Attack",
+    "info":"",
+    "x":75,
+    "y":25,
+    "z":"1f4d7662.4c1422",
+    "wires":[
+
+    ]
+  },
+  {
+    "id":"d62684a8.4a33e",
+    "type":"mqtt in",
+    "name":"Attack request from client",
+    "topic":"something/attack",
+    "broker":"6efc6b8.e8fa194",
+    "x":118,
+    "y":65,
+    "z":"1f4d7662.4c1422",
+    "wires":[
+      [
+        "6accc114.efb8a8"
+      ]
+    ]
+  },
+  {
+    "id":"6accc114.efb8a8",
+    "type":"function",
+    "name":"Process attack message",
+    "func":"msg.payload = JSON.parse(msg.payload);\nmsg.headers = {\"Content-Type\" : \"application/json\"};\n\nreturn msg;",
+    "outputs":1,
+    "x":380,
+    "y":38,
+    "z":"1f4d7662.4c1422",
+    "wires":[
+      [
+        "79cb411c.1e3f68"
+      ]
+    ]
+  },
+  {
+    "id":"79cb411c.1e3f68",
+    "type":"http request",
+    "name":"Attack request to Liberty",
+    "method":"POST",
+    "url":"http://localhost:9080/LibertyPaintball/liberty_paintball_api/attack",
+    "x":653,
+    "y":45,
+    "z":"1f4d7662.4c1422",
+    "wires":[
+      [
+        "b05b3551.cda5b",
+        "ba4930f.0bb6b5"
+      ]
+    ]
+  },
+  {
+    "id":"612c19c1.28a8c8",
+    "type":"inject",
+    "name":"Squirt in fake attack request here",
+    "topic":"",
+    "payload":"{\"username\":\"user1\",\"longitude\":\"-1.39524999\",\"latitude\":\"51.02674915\"}",
+    "repeat":"",
+    "crontab":"",
+    "once":false,
+    "x":156,
+    "y":130,
+    "z":"1f4d7662.4c1422",
+    "wires":[
+      [
+        "6accc114.efb8a8"
+      ]
+    ]
+  },
+  {
+    "id":"b05b3551.cda5b",
+    "type":"debug",
+    "name":"Full return from Liberty",
+    "active":false,
+    "complete":"true",
+    "x":936,
+    "y":32,
+    "z":"1f4d7662.4c1422",
+    "wires":[
+
+    ]
+  },
+  {
+    "id":"e63569e0.ae6e2",
+    "type":"comment",
+    "name":"Respond to attack",
+    "info":"",
+    "x":90,
+    "y":224,
+    "z":"1f4d7662.4c1422",
+    "wires":[
+
+    ]
+  },
+  {
+    "id":"cda2f99.766dc88",
+    "type":"comment",
+    "name":"Location Update",
+    "info":"",
+    "x":80,
+    "y":36,
+    "z":"550ac689.88e1a8",
+    "wires":[
+
+    ]
+  },
+  {
+    "id":"b2c0d624.865268",
+    "type":"mqtt in",
+    "name":"Update request from client",
+    "topic":"something/locationUpdate",
+    "broker":"6efc6b8.e8fa194",
+    "x":127,
+    "y":98,
+    "z":"550ac689.88e1a8",
+    "wires":[
+      [
+        "cea9bc67.9d9d78"
+      ]
+    ]
+  },
+  {
+    "id":"cea9bc67.9d9d78",
+    "type":"function",
+    "name":"Process location update message",
+    "func":"msg.payload = JSON.parse(msg.payload);\nmsg.headers = {\"Content-Type\" : \"application/json\"};\n\nreturn msg;",
+    "outputs":1,
+    "x":379,
+    "y":156,
+    "z":"550ac689.88e1a8",
+    "wires":[
+      [
+        "d5e9f1d1.d8fe9"
+      ]
+    ]
+  },
+  {
+    "id":"d5e9f1d1.d8fe9",
+    "type":"http request",
+    "name":"Update location request to Liberty",
+    "method":"POST",
+    "url":"http://localhost:9080/LibertyPaintball/liberty_paintball_api/update",
+    "x":706,
+    "y":214,
+    "z":"550ac689.88e1a8",
+    "wires":[
+      [
+        "370afaed.d19eae"
+      ]
+    ]
+  },
+  {
+    "id":"6ef410a7.f7d03",
+    "type":"inject",
+    "name":"Squirt in fake update request here",
+    "topic":"",
+    "payload":"{\"username\":\"user1\",\"longitude\":\"-1.39532748\",\"latitude\":\"51.02669642\"}",
+    "repeat":"",
+    "crontab":"",
+    "once":false,
+    "x":166,
+    "y":264,
+    "z":"550ac689.88e1a8",
+    "wires":[
+      [
+        "cea9bc67.9d9d78"
+      ]
+    ]
+  },
+  {
+    "id":"370afaed.d19eae",
+    "type":"debug",
+    "name":"Full return from Liberty",
+    "active":false,
+    "complete":"true",
+    "x":935,
+    "y":318,
+    "z":"550ac689.88e1a8",
+    "wires":[
+
+    ]
+  },
+  {
+    "id":"9f12b936.4c1e78",
+    "type":"switch",
+    "name":"Switch on attack response",
+    "property":"payload.responseType",
+    "rules":[
+      {
+        "t":"eq",
+        "v":"MISS"
+      },
+      {
+        "t":"eq",
+        "v":"HIT"
+      },
+      {
+        "t":"eq",
+        "v":"OUTGUNNED"
+      }
+    ],
+    "checkall":"true",
+    "outputs":3,
+    "x":143,
+    "y":427,
+    "z":"1f4d7662.4c1422",
+    "wires":[
+      [
+        "2e245e5a.1df83a"
+      ],
+      [
+        "2b658565.e8d662"
+      ],
+      [
+        "64ebe6c3.0ee9"
+      ]
+    ]
+  },
+  {
+    "id":"ba4930f.0bb6b5",
+    "type":"function",
+    "name":"Convert to JavaScript object",
+    "func":"// To get the switch node to behave nicely, we need to \n// pass in an JavaScript object, not some JSON\n\nmsg.payload = JSON.parse(msg.payload);\nreturn msg;",
+    "outputs":1,
+    "x":157,
+    "y":272,
+    "z":"1f4d7662.4c1422",
+    "wires":[
+      [
+        "9f12b936.4c1e78"
+      ]
+    ]
+  },
+  {
+    "id":"76648506.bbd3f4",
+    "type":"comment",
+    "name":"MISS",
+    "info":"",
+    "x":471,
+    "y":181,
+    "z":"1f4d7662.4c1422",
+    "wires":[
+
+    ]
+  },
+  {
+    "id":"74f7ebb5.538154",
+    "type":"comment",
+    "name":"SPLAT",
+    "info":"",
+    "x":426,
+    "y":301,
+    "z":"1f4d7662.4c1422",
+    "wires":[
+
+    ]
+  },
+  {
+    "id":"f92030a1.92b82",
+    "type":"comment",
+    "name":"OUTGUNNED",
+    "info":"",
+    "x":424,
+    "y":439,
+    "z":"1f4d7662.4c1422",
+    "wires":[
+
+    ]
+  },
+  {
+    "id":"18ff9ae4.6ce90d",
+    "type":"mqtt out",
+    "name":"Send 'miss' message to client",
+    "topic":"",
+    "broker":"6efc6b8.e8fa194",
+    "x":867,
+    "y":123,
+    "z":"1f4d7662.4c1422",
+    "wires":[
+
+    ]
+  },
+  {
+    "id":"2e245e5a.1df83a",
+    "type":"function",
+    "name":"Manipulate message",
+    "func":"// Need to set message.topic to msg.payload.attackerIdentity.username\nmsg.topic = \"something/attResponse/\" + msg.payload.attackerIdentity.username;\n\n// return the whole object to the client\nreturn msg;",
+    "outputs":1,
+    "x":454,
+    "y":221,
+    "z":"1f4d7662.4c1422",
+    "wires":[
+      [
+        "18ff9ae4.6ce90d",
+        "f0939649.5a48e8"
+      ]
+    ]
+  },
+  {
+    "id":"b271488b.876b68",
+    "type":"twitter out",
+    "twitter":"e248c633.8c0bf",
+    "name":"Tweet miss information",
+    "x":959,
+    "y":230,
+    "z":"1f4d7662.4c1422",
+    "wires":[
+
+    ]
+  },
+  {
+    "id":"f0939649.5a48e8",
+    "type":"function",
+    "name":"Modify message for tweet",
+    "func":"var date = new Date();\nvar now = date.toUTCString();\n\nmsg.payload = msg.payload.attackerIdentity.generatedName + \" just took a turn at \" + now + \" and missed\";\n\nreturn msg;",
+    "outputs":1,
+    "x":720,
+    "y":230,
+    "z":"1f4d7662.4c1422",
+    "wires":[
+      [
+        "b271488b.876b68"
+      ]
+    ]
+  },
+  {
+    "id":"2b658565.e8d662",
+    "type":"function",
+    "name":"Manipulate message",
+    "func":"// Need to set message.topic to msg.payload.attackerIdentity.username\nmsg.topic = \"something/attResponse/\" + msg.payload.attackerIdentity.username;\n\n// return the whole object to the client\nreturn msg;",
+    "outputs":1,
+    "x":451,
+    "y":352,
+    "z":"1f4d7662.4c1422",
+    "wires":[
+      [
+        "78fb0bb1.0113fc",
+        "314a24d7.9c55fc",
+        "5bcee558.6ec6a4"
+      ]
+    ]
+  },
+  {
+    "id":"314a24d7.9c55fc",
+    "type":"mqtt out",
+    "name":"Send 'splat' message to client",
+    "topic":"",
+    "broker":"6efc6b8.e8fa194",
+    "x":848,
+    "y":345,
+    "z":"1f4d7662.4c1422",
+    "wires":[
+
+    ]
+  },
+  {
+    "id":"df29e870.a22c3",
+    "type":"mqtt out",
+    "name":"Send splatted message to opponent",
+    "topic":"",
+    "broker":"6efc6b8.e8fa194",
+    "x":929,
+    "y":294,
+    "z":"1f4d7662.4c1422",
+    "wires":[
+
+    ]
+  },
+  {
+    "id":"2de42eba.571802",
+    "type":"twitter out",
+    "twitter":"e248c633.8c0bf",
+    "name":"Tweet splat information",
+    "x":936,
+    "y":401,
+    "z":"1f4d7662.4c1422",
+    "wires":[
+
+    ]
+  },
+  {
+    "id":"5bcee558.6ec6a4",
+    "type":"function",
+    "name":"Modify message for tweet",
+    "func":"var date = new Date();\nvar now = date.toUTCString();\n\nmsg.payload = msg.payload.attackerIdentity.generatedName + \" just took a turn at \" \n              + now + \" and splatted \" + msg.payload.participantIdentities[0].generatedName;\n\nreturn msg;",
+    "outputs":1,
+    "x":685,
+    "y":402,
+    "z":"1f4d7662.4c1422",
+    "wires":[
+      [
+        "2de42eba.571802"
+      ]
+    ]
+  },
+  {
+    "id":"78fb0bb1.0113fc",
+    "type":"function",
+    "name":"Modify splatted message",
+    "func":"// Need to set message.topic to something/killed/$username\nmsg.topic = \"something/splat/\" + msg.payload.participantIdentities[0].username;\n\nvar date = new Date();\nvar now = date.toUTCString();\n\nmsg.payload.message = \"You were splatted at \" + now + \" by \" + msg.payload.attackerIdentity.generatedName;\n\nreturn msg;",
+    "outputs":1,
+    "x":674,
+    "y":294,
+    "z":"1f4d7662.4c1422",
+    "wires":[
+      [
+        "df29e870.a22c3"
+      ]
+    ]
+  },
+  {
+    "id":"c78c1d62.7190f8",
+    "type":"function",
+    "name":"Process news feed request message",
+    "func":"// pass the username through so that we can return the newsfeed to the\n// client's personal topic\nmsg.payload = JSON.parse(msg.payload);\nmsg.topic = msg.payload.username;\n\nreturn msg;",
+    "outputs":1,
+    "x":395,
+    "y":166,
+    "z":"347b9e93.569f32",
+    "wires":[
+      [
+        "bd4a0e32.4fc638"
+      ]
+    ]
+  },
+  {
+    "id":"bd4a0e32.4fc638",
+    "type":"http request",
+    "name":"News feed request to Liberty",
+    "method":"GET",
+    "url":"http://localhost:9080/LibertyPaintball/liberty_paintball_api/map",
+    "x":531,
+    "y":278,
+    "z":"347b9e93.569f32",
+    "wires":[
+      [
+        "24c96c45.f068cc",
+        "77d176ad.429c2"
+      ]
+    ]
+  },
+  {
+    "id":"24c96c45.f068cc",
+    "type":"debug",
+    "name":"Full return from Liberty",
+    "active":false,
+    "complete":"true",
+    "x":831,
+    "y":294,
+    "z":"347b9e93.569f32",
+    "wires":[
+
+    ]
+  },
+  {
+    "id":"89957743.10bd1",
+    "type":"mqtt in",
+    "name":"",
+    "topic":"something/requestNews",
+    "broker":"6efc6b8.e8fa194",
+    "x":106,
+    "y":75,
+    "z":"347b9e93.569f32",
+    "wires":[
+      [
+        "c78c1d62.7190f8"
+      ]
+    ]
+  },
+  {
+    "id":"45094939.c0b1c",
+    "type":"mqtt out",
+    "name":"News feed to client",
+    "topic":"",
+    "broker":"6efc6b8.e8fa194",
+    "x":838,
+    "y":480,
+    "z":"347b9e93.569f32",
+    "wires":[
+
+    ]
+  },
+  {
+    "id":"f98a157b.14aba",
+    "type":"comment",
+    "name":"News feed request",
+    "info":"",
+    "x":86,
+    "y":24,
+    "z":"347b9e93.569f32",
+    "wires":[
+
+    ]
+  },
+  {
+    "id":"77d176ad.429c2",
+    "type":"function",
+    "name":"Manipulate message",
+    "func":"// Need to set message.topic to something/news/$username\n// good job we hid that in the msg.topic earlier :o)\nmsg.topic = \"something/news/\" + msg.topic;\n\n// return the whole object to the client\nreturn msg;",
+    "outputs":1,
+    "x":592,
+    "y":431,
+    "z":"347b9e93.569f32",
+    "wires":[
+      [
+        "45094939.c0b1c"
+      ]
+    ]
+  },
+  {
+    "id":"7a4fe50a.0b0c54",
+    "type":"twitter in",
+    "twitter":"e248c633.8c0bf",
+    "tags":"@SSomethingL",
+    "user":"true",
+    "name":"Request to Twitter",
+    "topic":"tweets",
+    "x":81,
+    "y":246,
+    "z":"439bb71e.ef977",
+    "wires":[
+      [
+        "d93db900.0c0ef"
+      ]
+    ]
+  },
+  {
+    "id":"e6bdd9f9.a6f37",
+    "type":"comment",
+    "name":"Joining Game",
+    "info":"",
+    "x":550,
+    "y":114,
+    "z":"439bb71e.ef977",
+    "wires":[
+
+    ]
+  },
+  {
+    "id":"d6f8a0c1.f69eb",
+    "type":"debug",
+    "name":"Username",
+    "active":false,
+    "complete":"false",
+    "x":611,
+    "y":38,
+    "z":"439bb71e.ef977",
+    "wires":[
+
+    ]
+  },
+  {
+    "id":"1aab6e00.bd28c2",
+    "type":"comment",
+    "name":"Leaving Game",
+    "info":"",
+    "x":473,
+    "y":433,
+    "z":"439bb71e.ef977",
+    "wires":[
+
+    ]
+  },
+  {
+    "id":"1e9424.51fe63dd",
+    "type":"http request",
+    "name":"Join request to Liberty",
+    "method":"POST",
+    "url":"http://localhost:9080/LibertyPaintball/liberty_paintball_api/join",
+    "x":848,
+    "y":148,
+    "z":"439bb71e.ef977",
+    "wires":[
+      [
+        "fec3d79.7d82628",
+        "b91637ce.5264c8"
+      ]
+    ]
+  },
+  {
+    "id":"16337172.4f0a17",
+    "type":"function",
+    "name":"JSON-ify message to Liberty",
+    "func":"joinObject =\n{\n\tusername : msg.payload\n}\n\nmsg.payload = joinObject;\nmsg.headers = {\"Content-Type\" : \"application/json\" };\n\nreturn msg;",
+    "outputs":1,
+    "x":570,
+    "y":179,
+    "z":"439bb71e.ef977",
+    "wires":[
+      [
+        "e47f7f4e.5d28f8",
+        "1e9424.51fe63dd"
+      ]
+    ]
+  },
+  {
+    "id":"fec3d79.7d82628",
+    "type":"debug",
+    "name":"Full return from Liberty",
+    "active":false,
+    "complete":"true",
+    "x":949,
+    "y":279,
+    "z":"439bb71e.ef977",
+    "wires":[
+
+    ]
+  },
+  {
+    "id":"e47f7f4e.5d28f8",
+    "type":"debug",
+    "name":"JSON-ified payload to Liberty",
+    "active":false,
+    "complete":"false",
+    "x":781,
+    "y":82,
+    "z":"439bb71e.ef977",
+    "wires":[
+
+    ]
+  },
+  {
+    "id":"ce6e5783.60e058",
+    "type":"function",
+    "name":"JSON-ify message to Liberty",
+    "func":"leaveObject =\n{\n\tusername : msg.payload\n}\n\nmsg.payload = leaveObject;\nmsg.headers = {\"Content-Type\" : \"application/json\" };\n\nreturn msg;",
+    "outputs":1,
+    "x":498,
+    "y":553,
+    "z":"439bb71e.ef977",
+    "wires":[
+      [
+        "4bf4e17f.422fc",
+        "99df59b8.283528"
+      ]
+    ]
+  },
+  {
+    "id":"4bf4e17f.422fc",
+    "type":"http request",
+    "name":"Leave request to Liberty",
+    "method":"POST",
+    "url":"http://localhost:9080/LibertyPaintball/liberty_paintball_api/leave",
+    "x":740,
+    "y":617,
+    "z":"439bb71e.ef977",
+    "wires":[
+      [
+        "225a7790.b8a61"
+      ]
+    ]
+  },
+  {
+    "id":"225a7790.b8a61",
+    "type":"debug",
+    "name":"Full return from Liberty",
+    "active":false,
+    "complete":"true",
+    "x":927,
+    "y":544,
+    "z":"439bb71e.ef977",
+    "wires":[
+
+    ]
+  },
+  {
+    "id":"99df59b8.283528",
+    "type":"debug",
+    "name":"JSON-ified payload to Liberty",
+    "active":false,
+    "complete":"false",
+    "x":791,
+    "y":479,
+    "z":"439bb71e.ef977",
+    "wires":[
+
+    ]
+  },
+  {
+    "id":"58f575ae.2cf024",
+    "type":"inject",
+    "name":"Squirt in fake username here - attach to JSON-ify node to use",
+    "topic":"",
+    "payload":"user1",
+    "repeat":"",
+    "crontab":"",
+    "once":false,
+    "x":237,
+    "y":359,
+    "z":"439bb71e.ef977",
+    "wires":[
+      [
+        "16337172.4f0a17"
+      ]
+    ]
+  },
+  {
+    "id":"b087831.101f3",
+    "type":"debug",
+    "name":"joining game",
+    "active":false,
+    "complete":"false",
+    "x":565,
+    "y":244,
+    "z":"439bb71e.ef977",
+    "wires":[
+
+    ]
+  },
+  {
+    "id":"b472ec2.106aa9",
+    "type":"debug",
+    "name":"leaving game",
+    "active":false,
+    "complete":"false",
+    "x":471,
+    "y":490,
+    "z":"439bb71e.ef977",
+    "wires":[
+
+    ]
+  },
+  {
+    "id":"d93db900.0c0ef",
+    "type":"function",
+    "name":"Pull apart tweet",
+    "func":"\t  // pull out the topic from the message\n\t  // split it so that we get the twitter id\n\t  // of the sender\n      var words = msg.topic.split(\"/\");\n      var username = {};\n      username.payload = words[1];\n\n      // grab whether we're a join or a leave message\n      var joinOrLeave = \"\";\n      var words3 = msg.tweet.text.split(\" \");    \n      joinOrLeave = words3[1];\n\n      if(joinOrLeave === 'join'){\n        return [username, username, null];\n      } else {\n        return [username, null, username];\n      }",
+    "outputs":"3",
+    "x":250,
+    "y":246,
+    "z":"439bb71e.ef977",
+    "wires":[
+      [
+        "d6f8a0c1.f69eb"
+      ],
+      [
+        "16337172.4f0a17",
+        "b087831.101f3"
+      ],
+      [
+        "b472ec2.106aa9",
+        "ce6e5783.60e058"
+      ]
+    ]
+  },
+  {
+    "id":"fe843f9b.6da478",
+    "type":"http request",
+    "name":"Gossip request to Liberty",
+    "method":"GET",
+    "url":"http://localhost:9080/LibertyPaintball/liberty_paintball_api/intel",
+    "x":367,
+    "y":117,
+    "z":"91a87dc4.866cd",
+    "wires":[
+      [
+        "7c0c0f18.0da328",
+        "c59c5b79.fc3e58"
+      ]
+    ]
+  },
+  {
+    "id":"4da40dc9.658a04",
+    "type":"inject",
+    "name":"Squirt to get some gossip",
+    "topic":"",
+    "payload":"",
+    "repeat":"",
+    "crontab":"0 */1 * * *",
+    "once":false,
+    "x":134,
+    "y":71,
+    "z":"91a87dc4.866cd",
+    "wires":[
+      [
+        "fe843f9b.6da478"
+      ]
+    ]
+  },
+  {
+    "id":"7c0c0f18.0da328",
+    "type":"function",
+    "name":"Manipulate message",
+    "func":"// To get the switch node to behave nicely, we need to \n// pass in an JavaScript object, not some JSON\n\nmsg.payload = JSON.parse(msg.payload);\nreturn msg;",
+    "outputs":"1",
+    "x":158,
+    "y":328,
+    "z":"91a87dc4.866cd",
+    "wires":[
+      [
+        "25145785.964a08"
+      ]
+    ]
+  },
+  {
+    "id":"495e8fe8.cb29b8",
+    "type":"delay",
+    "name":"Delay gossip publish",
+    "pauseType":"delay",
+    "timeout":"1",
+    "timeoutUnits":"minutes",
+    "rate":"1",
+    "rateUnits":"second",
+    "randomFirst":"1",
+    "randomLast":"5",
+    "randomUnits":"seconds",
+    "x":472,
+    "y":509,
+    "z":"91a87dc4.866cd",
+    "wires":[
+      [
+        "eb688f32.d8c1"
+      ]
+    ]
+  },
+  {
+    "id":"4b042eb6.0d224",
+    "type":"debug",
+    "name":"Message not delayed",
+    "active":false,
+    "complete":"false",
+    "x":902,
+    "y":298,
+    "z":"91a87dc4.866cd",
+    "wires":[
+
+    ]
+  },
+  {
+    "id":"25145785.964a08",
+    "type":"switch",
+    "name":"Should we delay?",
+    "property":"payload.shouldDelayPublicizing",
+    "rules":[
+      {
+        "t":"false"
+      },
+      {
+        "t":"true"
+      }
+    ],
+    "checkall":"true",
+    "outputs":2,
+    "x":285,
+    "y":439,
+    "z":"91a87dc4.866cd",
+    "wires":[
+      [
+        "c1e8a0dd.a12ee"
+      ],
+      [
+        "495e8fe8.cb29b8"
+      ]
+    ]
+  },
+  {
+    "id":"c1e8a0dd.a12ee",
+    "type":"function",
+    "name":"No delay - pass on message",
+    "func":"msg.payload = \"Intel: \" + msg.payload.message;\n\nreturn msg;",
+    "outputs":1,
+    "x":617,
+    "y":340,
+    "z":"91a87dc4.866cd",
+    "wires":[
+      [
+        "4b042eb6.0d224",
+        "ef0c6f8e.2d86f8"
+      ]
+    ]
+  },
+  {
+    "id":"486dbe96.7981d",
+    "type":"debug",
+    "name":"Message delayed",
+    "active":false,
+    "complete":"false",
+    "x":895,
+    "y":596,
+    "z":"91a87dc4.866cd",
+    "wires":[
+
+    ]
+  },
+  {
+    "id":"ef0c6f8e.2d86f8",
+    "type":"twitter out",
+    "twitter":"e248c633.8c0bf",
+    "name":"Tweet some gossip!",
+    "x":932,
+    "y":431,
+    "z":"91a87dc4.866cd",
+    "wires":[
+
+    ]
+  },
+  {
+    "id":"d63c280f.39a61",
+    "type":"inject",
+    "name":"Squirt in a username to receive news",
+    "topic":"",
+    "payload":"{\"username\":\"user1\"}",
+    "repeat":"",
+    "crontab":"",
+    "once":false,
+    "x":169,
+    "y":336,
+    "z":"347b9e93.569f32",
+    "wires":[
+      [
+        "c78c1d62.7190f8"
+      ]
+    ]
+  },
+  {
+    "id":"64ebe6c3.0ee9",
+    "type":"function",
+    "name":"Manipulate message",
+    "func":"// Need to set message.topic to msg.payload.attackerIdentity.username\nmsg.topic = \"something/attResponse/\" + msg.payload.attackerIdentity.username;\n\n// return the whole object to the client\nreturn msg;",
+    "outputs":1,
+    "x":431,
+    "y":482,
+    "z":"1f4d7662.4c1422",
+    "wires":[
+      [
+        "f65ccb37.066028",
+        "771a18bf.8ac5e",
+        "6d3edfc3.3abe8"
+      ]
+    ]
+  },
+  {
+    "id":"6d3edfc3.3abe8",
+    "type":"mqtt out",
+    "name":"Send 'outgunned' message to client",
+    "topic":"",
+    "broker":"6efc6b8.e8fa194",
+    "x":790,
+    "y":456,
+    "z":"1f4d7662.4c1422",
+    "wires":[
+
+    ]
+  },
+  {
+    "id":"771a18bf.8ac5e",
+    "type":"function",
+    "name":"Modify message for tweet",
+    "func":"var date = new Date();\nvar now = date.toUTCString();\n\nmsg.payload = msg.payload.attackerIdentity.generatedName + \" was outgunned at \" + now;\n\nreturn msg;",
+    "outputs":1,
+    "x":694,
+    "y":507,
+    "z":"1f4d7662.4c1422",
+    "wires":[
+      [
+        "bb72d8f1.f21c88"
+      ]
+    ]
+  },
+  {
+    "id":"bb72d8f1.f21c88",
+    "type":"twitter out",
+    "twitter":"e248c633.8c0bf",
+    "name":"Tweet outgun information",
+    "x":944,
+    "y":507,
+    "z":"1f4d7662.4c1422",
+    "wires":[
+
+    ]
+  },
+  {
+    "id":"f65ccb37.066028",
+    "type":"function",
+    "name":"Create a list of messages to send",
+    "func":"// create an array to store our messages in\nvar messageArray = [];\n\n// iterate around participants and add them to the array\nfor(var i = 0 ; i < msg.payload.participantIdentities.length ; i++){\n  var newMsg = {};\n  newMsg.topic = \"something/outgunner/\" + msg.payload.participantIdentities[i].username; \n  newMsg.payload = {\"message\" : msg.payload.participantMessage};\n  messageArray.push(newMsg);\n}\n\n// return the whole array to the client\nreturn [messageArray];",
+    "outputs":1,
+    "x":543,
+    "y":599,
+    "z":"1f4d7662.4c1422",
+    "wires":[
+      [
+        "58177700.78849"
+      ]
+    ]
+  },
+  {
+    "id":"58177700.78849",
+    "type":"mqtt out",
+    "name":"Send outgunner information to all participants",
+    "topic":"",
+    "broker":"6efc6b8.e8fa194",
+    "x":870,
+    "y":599,
+    "z":"1f4d7662.4c1422",
+    "wires":[
+
+    ]
+  },
+  {
+    "id":"c59c5b79.fc3e58",
+    "type":"debug",
+    "name":"",
+    "active":false,
+    "complete":false,
+    "x":654,
+    "y":74,
+    "z":"91a87dc4.866cd",
+    "wires":[
+
+    ]
+  },
+  {
+    "id":"eb688f32.d8c1",
+    "type":"function",
+    "name":"No delay - pass on message",
+    "func":"msg.payload = \"Intel: \" + msg.payload.message;\n\nreturn msg;",
+    "outputs":1,
+    "x":647,
+    "y":593,
+    "z":"91a87dc4.866cd",
+    "wires":[
+      [
+        "486dbe96.7981d",
+        "ef0c6f8e.2d86f8"
+      ]
+    ]
+  },
+  {
+    "id":"b91637ce.5264c8",
+    "type":"function",
+    "name":"Manipulate message",
+    "func":"// Parse the return from the server\nmsg.payload = JSON.parse(msg.payload);\n\n// return what we want tweeted\nmsg.payload = msg.payload.playerIdentity.generatedName + \" has joined the game\";\nreturn msg;",
+    "outputs":1,
+    "x":723,
+    "y":334,
+    "z":"439bb71e.ef977",
+    "wires":[
+      [
+        "3997fb84.1bd30c",
+        "16c2c5ad.a4f222"
+      ]
+    ]
+  },
+  {
+    "id":"16c2c5ad.a4f222",
+    "type":"twitter out",
+    "twitter":"e248c633.8c0bf",
+    "name":"Tweet who joined",
+    "x":930,
+    "y":333,
+    "z":"439bb71e.ef977",
+    "wires":[
+
+    ]
+  },
+  {
+    "id":"3997fb84.1bd30c",
+    "type":"debug",
+    "name":"The tweet we send",
+    "active":false,
+    "complete":"false",
+    "x":886,
+    "y":412,
+    "z":"439bb71e.ef977",
+    "wires":[
+
+    ]
+  },
+  {
+    "id":"c4bf79b5.ddc468",
+    "type":"function",
+    "name":"Process identity request message",
+    "func":"// pass the username through so that we can return the identity to the\n// client's personal topic\nmsg.payload = JSON.parse(msg.payload);\nmsg.topic = msg.payload.username;\n\nidRequestObject =\n{\n\tusername : msg.payload.username\n}\n\nmsg.payload = idRequestObject;\nmsg.headers = {\"Content-Type\" : \"application/json\" };\n\nreturn msg;",
+    "outputs":1,
+    "x":417,
+    "y":149,
+    "z":"bac47413.be7f",
+    "wires":[
+      [
+        "c073f7f6.5e95"
+      ]
+    ]
+  },
+  {
+    "id":"c073f7f6.5e95",
+    "type":"http request",
+    "name":"Identity request to Liberty",
+    "method":"POST",
+    "url":"http://localhost:9080/LibertyPaintball/liberty_paintball_api/request_id",
+    "x":553,
+    "y":255,
+    "z":"bac47413.be7f",
+    "wires":[
+      [
+        "fe74ed41.b70f18",
+        "7e19356f.403eec"
+      ]
+    ]
+  },
+  {
+    "id":"fe74ed41.b70f18",
+    "type":"debug",
+    "name":"Full return from Liberty",
+    "active":false,
+    "complete":"true",
+    "x":856,
+    "y":273,
+    "z":"bac47413.be7f",
+    "wires":[
+
+    ]
+  },
+  {
+    "id":"a6a63c01.ecceb8",
+    "type":"mqtt in",
+    "name":"",
+    "topic":"something/requestPlayerIdentity",
+    "broker":"6efc6b8.e8fa194",
+    "x":144,
+    "y":89,
+    "z":"bac47413.be7f",
+    "wires":[
+      [
+        "c4bf79b5.ddc468"
+      ]
+    ]
+  },
+  {
+    "id":"562f3928.1c959",
+    "type":"mqtt out",
+    "name":"Identity to client",
+    "topic":"",
+    "broker":"6efc6b8.e8fa194",
+    "x":860,
+    "y":457,
+    "z":"bac47413.be7f",
+    "wires":[
+
+    ]
+  },
+  {
+    "id":"7e19356f.403eec",
+    "type":"function",
+    "name":"Manipulate message",
+    "func":"// Need to set message.topic to something/requestPlayerIdentity/$username\n// good job we hid that in the msg.topic earlier :o)\nmsg.topic = \"something/requestPlayerIdentity/\" + msg.topic;\n\n// return the whole object to the client\nreturn msg;",
+    "outputs":1,
+    "x":614,
+    "y":408,
+    "z":"bac47413.be7f",
+    "wires":[
+      [
+        "562f3928.1c959"
+      ]
+    ]
+  },
+  {
+    "id":"ae09b696.e881e",
+    "type":"inject",
+    "name":"Squirt in a username to request identity",
+    "topic":"",
+    "payload":"{\"username\":\"user1\"}",
+    "repeat":"",
+    "crontab":"",
+    "once":false,
+    "x":191,
+    "y":313,
+    "z":"bac47413.be7f",
+    "wires":[
+      [
+        "c4bf79b5.ddc468"
+      ]
+    ]
+  },
+  {
+    "id":"5d1541cf.4d69a",
+    "type":"comment",
+    "name":"Intel request",
+    "info":"",
+    "x":69,
+    "y":25,
+    "z":"91a87dc4.866cd",
+    "wires":[
+
+    ]
+  },
+  {
+    "id":"ec39bd4f.29b91",
+    "type":"comment",
+    "name":"Identity request",
+    "info":"",
+    "x":76,
+    "y":36,
+    "z":"bac47413.be7f",
+    "wires":[
+
+    ]
+  }
+]
