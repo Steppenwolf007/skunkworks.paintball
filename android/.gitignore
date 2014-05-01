@@ -7,6 +7,6 @@
 *.iml
 *proguard*
 *BrokerDetails.java
-SomethingLiberty/assets/OpenLayers
-SomethingLiberty/libs
+assets/OpenLayers
+libs
 **/getpebble/*
