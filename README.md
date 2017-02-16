@@ -3,7 +3,7 @@ Liberty Paintball
 
 Liberty Paintball, a mobile game demonstrating various IBM technologies including the Liberty profile.
 
-More information can be found here: https://www.ibmdw.net/wasdev/2014/03/05/introducing-liberty-paintball-game/
+More information can be found here: https://developer.ibm.com/wasdev/blog/2014/03/05/introducing-liberty-paintball-game/
 
 
 Structure
